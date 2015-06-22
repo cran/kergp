@@ -1,0 +1,42 @@
+useDynLib(kergp)
+
+import("methods")
+import("MASS")
+import("numDeriv")
+import("Rcpp")
+import("testthat")
+importFrom("stats", predict)
+importFrom("stats", influence)
+importFrom("stats", coef)
+importFrom("stats", coefficients)
+importFrom("stats", simulate)
+importFrom("stats4", "coef")
+## importFrom("DiceKriging", "coef<-")
+## S4
+exportClasses(covTS, covMan, covAll)
+
+## All methods, for own or "foreign" generics:
+exportMethods(
+    npar, kernelName, inputNames,  parMap, checkX, 
+    show,
+    coef, "coef<-", coefLower, "coefLower<-", coefUpper, "coefUpper<-",
+    simulPar,
+    covMat, scores,
+    mle, gls,
+    coerce
+)
+
+export(## k1exp, k1gauss, k1powExp, k1matern3_2, k1matern5_2, ## 1d kernels
+       covTS, covMan, gp, ## constructors
+       npar, kernelName, inputNames,
+       parMap, checkX,
+       mle)
+
+S3method(coef, gp)
+S3method(predict, gp)
+S3method(influence, gp)
+S3method(plot, gp)
+S3method(print, gp)
+S3method(summary, gp)
+S3method(print, summary.gp)
+
