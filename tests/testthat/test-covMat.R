@@ -1,3 +1,7 @@
+library(testthat)
+library(kergp)
+
+set.seet(314159)
 myCov <- covTS(inputs = c("Temp", "Humid", "Press"),
                kernel = "k1powExp",
                dep = c(range = "cst", shape = "cst"),

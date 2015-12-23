@@ -1,3 +1,13 @@
+2015-12-22  yves  <deville.yves@alpestat.com>
+
+	* Added imports from base packages in 'NAMESPACE'.
+
+	* Moved test files from 'int/tests' to 'tests/testthat' and removed
+	'test-all.R' therein.
+
+	* Fixed the problem of non-list dimnames in 'logLikFuns.R'.
+
+	
 2015-06-22  yves  <deville.yves@alpestat.com>
 
 	* In 'gp' using estim = FALSE and a given value of 'varNoise'

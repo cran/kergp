@@ -1,3 +1,42 @@
+# gp <- function(formula, data, 
+#                inputs, cov,
+#                estim = TRUE, 
+#                multistart = NULL,
+#                nCores = 1,
+#                .export = NULL,
+#                .packages = NULL,
+#                ...){
+#   if (length(multistart)==0) {
+#     try(gp1(formula = formula, data = data, 
+#         inputs = inputs, cov = cov, estim = estim, ...))
+#   } else {
+#     nfit <- ncol(multistart)
+#     cl <- makeCluster(nCores)
+#     registerDoParallel(cl)
+#     if (requireNamespace("foreach", quietly = TRUE)){
+#       olist <- foreach(i=1:nfit, .errorhandling = 'remove', .verbose=TRUE,
+#                        .export = .export, .packages = .packages) %dopar% (
+#         gp1(formula = formula, data = data, 
+#             inputs = inputs, cov = cov, estim = estim, 
+#             parCovIni = multistart[, i],  
+#             ...)
+#       )
+#     }
+#     
+#     stopCluster(cl)
+#     
+#     # get the best result
+#     nlist <- length(olist)
+#     print(nlist)
+#     optValue <- vector(length = nlist)
+#     if (nlist==0) stop("Maximum Likelihood error")
+#     for (i in 1:nlist){
+#       optValue[i] <- olist[[i]]$optValue
+#     }
+#     bestIndex <- which.max(optValue)
+#     return(olist[[bestIndex]])
+#   }
+# }
 
 gp <- function(formula, data,
                inputs, cov,
@@ -26,27 +65,31 @@ gp <- function(formula, data,
             ## this is the default value in mle, hence...
             LCall <- as.list(Call)
             if (!("compGrad" %in% names(LCall))) compGrad <- TRUE
-            else compGrad <- LCall[["compGrad"]]
+            else compGrad <- eval(LCall[["compGrad"]])
             if (compGrad && !cov@hasGrad) {
                 stop("when 'compGrad' is given and is TRUE, 'cov' object ",
                      "must compute the gradient")
             }
         }
+        
         fit <- try(mle(object = cov,
-                       y = y, X = X, F = F,
-                       ...))
+              y = y, X = X, F = F,
+              ...))
+
+        if (inherits(fit, "try-error")) stop("Maximum Likelihood error")
+        optValue <- fit$opt$val
         ## replace 'cov'.
         cov <- fit$cov
         ## varNoise <- fit$varNoise
         fit <- fit$trendRes
-        if (inherits(fit, "try-error")) stop("Maximum Likelihood error")
-
+        
     } else {
         ## if (is.na(varNoise)) varNoise <- NULL
         fit <- try(gls(object = cov,
                        y = y, X = X, F = F,
                        ...))
         if (inherits(fit, "try-error")) stop("Maximum Likelihood error")
+        optValue <- NULL
     }
     
     ##   if (is.null(coefTrend)) {
@@ -66,10 +109,11 @@ gp <- function(formula, data,
                 RStar = fit$RStar,
                 covariance = cov,
                 noise = fit$noise,
-                varNoise = fit$varNoise)
+                varNoise = fit$varNoise,
+                optValue = optValue)
     
     class(res) <- "gp"
-    res
+    return(res)
     
 }
 

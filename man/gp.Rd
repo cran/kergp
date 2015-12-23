@@ -54,6 +54,7 @@ gp(formula, data, inputs, cov, estim = TRUE, ...)
     \code{noise} is \code{TRUE}.
 
   }
+  
   \item{\dots}{
 
     Other arguments passed to the estimation method.  This will be the
@@ -366,3 +367,5 @@ tAll
 coefAll
 
 }
+
+

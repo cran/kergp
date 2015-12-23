@@ -73,13 +73,13 @@ setMethod("gls",
               }
               names(betaHat) <- colnames(F)
               
-              list(betaHat = betaHat,    ## estimate
+              return(list(betaHat = betaHat,    ## estimate
                    L = L,                ## Cholesky Lower root of C 
                    eStar = eStar,        ## inv(L) %*% error
                    sseStar = sseStar,    ## t(eStar) %*% eStar
                    FStar = FStar,        ## inv(L) %*% F
                    RStar = RStar,        ## qr.r(FStar)
                    noise = noise,
-                   varNoise = varNoise)  ## copy
+                   varNoise = varNoise))  ## copy
           }
           )

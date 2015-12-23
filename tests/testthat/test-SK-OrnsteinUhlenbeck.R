@@ -97,6 +97,10 @@ predictOUG <- function(newt, t, y,
     
 }
 
+library(testthat)
+library(kergp)
+set.seed(1234)
+
 n <- 4
 newn <- 100 ## 100000 would not be a problem here
 t <- sort(runif(n))

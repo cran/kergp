@@ -5,13 +5,18 @@ import("MASS")
 import("numDeriv")
 import("Rcpp")
 import("testthat")
-importFrom("stats", predict)
-importFrom("stats", influence)
-importFrom("stats", coef)
-importFrom("stats", coefficients)
-importFrom("stats", simulate)
+importFrom("stats", "predict", "influence", "coef", "coefficients", "simulate")
 importFrom("stats4", "coef")
+importFrom("parallel", "makeCluster", "stopCluster")
+importFrom("doParallel", "registerDoParallel")
 ## importFrom("DiceKriging", "coef<-")
+
+importFrom("graphics", "lines", "par", "plot")
+importFrom("stats", "delete.response", "lm", "model.frame",
+           "model.matrix", "model.response", "optim", "qnorm",
+           "qqline", "qqnorm", "qt", "rcauchy", "rexp", "runif",
+           "terms", "var")
+
 ## S4
 exportClasses(covTS, covMan, covAll)
 

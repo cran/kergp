@@ -1,3 +1,8 @@
+library(testthat)
+library(kergp)
+library(numDeriv)
+
+
 ## require (numDeriv)  now in 'Depends'
 precision <- 1e-6
 

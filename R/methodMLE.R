@@ -203,8 +203,8 @@ setMethod("mle",
                           } else varNoise <- NULL
                           if (opt$convergence) warning("optimisation did not converge\n")            
                       } else {
-                          warning("error in 'optim'\n")
-                          return(NULL)
+                          stop("error in 'optim'\n")
+                          #return(NULL)
                       }
                       
                       ## coef(object) <- coef.kernel[1L:lparNN]
@@ -253,13 +253,13 @@ setMethod("mle",
                       parTracked <- NULL
                   }
                   
-                  list(opt = opt,
-                       cov = object,
-                       noise = noise,
-                       varNoise = varNoise,
-                       trendRes = trendRes,
-                       parTracked = parTracked,
-                       logLikFun = thisLogLikFun)
+                  return(list(opt = opt,
+                              cov = object,
+                              noise = noise,
+                              varNoise = varNoise,
+                              trendRes = trendRes,
+                              parTracked = parTracked,
+                              logLikFun = thisLogLikFun))
                   
               }
           )

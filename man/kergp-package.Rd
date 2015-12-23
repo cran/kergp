@@ -28,8 +28,8 @@
 \tabular{ll}{
   Package: \tab kergp\cr
   Type: \tab Package\cr
-  Version: \tab 0.1.0\cr
-  Date: \tab 2015-06-22\cr
+  Version: \tab 0.2.0\cr
+  Date: \tab 2015-12-22\cr
   License: \tab GPL-3\cr
 }
 }
@@ -49,7 +49,7 @@
   Olivier Roustant (Mines Saint-Étienne), with contributions from
   Nicolas Durrande (Mines Saint-Étienne).
 
-  Maintainer: Yves Deville, <deville.yves@alpestat.com>
+  Maintainer: Olivier Roustant, <olivier.roustant@mines-stetienne.fr>
 
 }
 \references{
