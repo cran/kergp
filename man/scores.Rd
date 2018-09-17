@@ -2,7 +2,7 @@
 \alias{scores}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  Generic function returning the scores for a covariance kernel object
+  Generic Function: Scores for a Covariance Kernel Object
 }
 \description{
   

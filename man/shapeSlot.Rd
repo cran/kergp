@@ -2,7 +2,7 @@
 \alias{shapeSlot}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  Extracts the slots of a structure
+  Extracts the Slots of a Structure
 }
 \description{
 

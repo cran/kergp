@@ -1,11 +1,11 @@
 \name{coef<-}
 \alias{coef<-}
 \title{
-  Generic function for the replacement of coefficient values
+  Generic Function: Replacement of Coefficient Values
 }
 \description{
   
-  Generic function for the replacement of coefficient values
+  Generic function for the replacement of coefficient values.
   
 }
 \usage{

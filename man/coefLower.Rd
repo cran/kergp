@@ -5,7 +5,7 @@
 \alias{coefUpper<-}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  Extract or set lower/upper bounds on coefficients
+  Extract or Set Lower/Upper Bounds on Coefficients
 }
 \description{
 

@@ -2,8 +2,8 @@
 \alias{gls}
 \title{
   
-  Generic function computing a Generalized Least Squares estimation
-  with a given covariance kernel
+  Generic Function: Generalized Least Squares Estimation
+  with a Given Covariance Kernel
 
 }
 \description{

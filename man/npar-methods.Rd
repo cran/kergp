@@ -3,12 +3,15 @@
 %% \alias{npar-methods}
 \alias{npar,covMan-method}
 \alias{npar,covTS-method}
+\alias{npar,covMan-method}
 \title{
-  Number of parameters for a covariance kernel object
+  
+  Number of Parameters for a Covariance Kernel Object
+  
 }
 \description{
   
-Number of parameters for a covariance kernel object.
+  Number of parameters for a covariance kernel object.
 
 }
 \usage{

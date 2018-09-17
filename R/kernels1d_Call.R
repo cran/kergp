@@ -1,74 +1,84 @@
 
-k1expFun <- function(x1, x2, par) {
-  res <- .Call("k1Exp", x1, x2, par, PACKAGE = "kergp")
+k1FunExp <- function(x1, x2, par) {
+  res <- .Call("k1ExpC", x1, x2, par)
 }
 
-k1gaussFun <- function(x1, x2, par) {
-  res <- .Call("k1Gauss", x1, x2, par, PACKAGE = "kergp")
+k1FunGauss <- function(x1, x2, par) {
+  res <- .Call("k1GaussC", x1, x2, par)
 }
 
-k1powExpFun <- function(x1, x2, par) {
-  res <- .Call("k1PowExp", x1, x2, par, PACKAGE = "kergp")
+k1FunPowExp <- function(x1, x2, par) {
+  res <- .Call("k1PowExpC", x1, x2, par)
 }
 
-k1matern3_2Fun<- function(x1, x2, par) {
-  res <- .Call("k1Matern3_2", x1, x2, par, PACKAGE = "kergp")
+k1FunMatern3_2<- function(x1, x2, par) {
+  res <- .Call("k1Matern3_2C", x1, x2, par)
 }
 
-k1matern5_2Fun <- function(x1, x2, par) {
-  res <- .Call("k1Matern5_2", x1, x2, par, PACKAGE = "kergp")
+k1FunMatern5_2 <- function(x1, x2, par) {
+  res <- .Call("k1Matern5_2C", x1, x2, par)
 }
 
-k1exp <- new("covMan",            
-             kernel = k1expFun,
+k1Exp <- new("covMan",            
+             kernel = k1FunExp,
+             hasGrad = TRUE, 
+             acceptMatrix = FALSE,   
              label = "exponential",
              d = 1L,
-             inputNames = NULL,
-             parLower = c("range" = 0.0, "var" = 0.0),
+             inputNames = "x",
+             parLower = c("range" = 1e-8, "var" = 1e-8),
              parUpper = c("range" = Inf, "var" = Inf),
              par = c("range" = 1.0, "var" = 1.0),
              parN = 2L,
              kernParNames = c("range", "var"))
 
-k1gauss <- new("covMan",            
-               kernel = k1gaussFun,
+k1Gauss <- new("covMan",            
+               kernel = k1FunGauss,
+               hasGrad = TRUE, 
+               acceptMatrix = FALSE,   
                label = "gaussian",
                d = 1L,
-               inputNames = NULL,
-               parLower = c("range" = 0.0, "var" = 0.0),
+               inputNames = "x",
+               parLower = c("range" = 1e-8, "var" = 1e-8),
                parUpper = c("range" = Inf, "var" = Inf),
                par = c("range" = 1.0, "var" = 1.0),
                parN = 2L,
                kernParNames = c("range", "var"))
 
-k1matern3_2 <- new("covMan",            
-                   kernel = k1matern3_2Fun,
+k1Matern3_2 <- new("covMan",            
+                   kernel = k1FunMatern3_2,
+                   hasGrad = TRUE, 
+                   acceptMatrix = FALSE,   
                    label = "Matern nu = 3/2",
                    d = 1L,
-                   inputNames = NULL,
-                   parLower = c("range" = 0.0, "var" = 0.0),
+                   inputNames = "x",
+                   parLower = c("range" = 1e-8, "var" = 1e-8),
                    parUpper = c("range" = Inf, "var" = Inf),
                    par = c("range" = 1.0, "var" = 1.0),
                    parN = 2L,
                    kernParNames = c("range", "var"))
 
-k1matern5_2 <- new("covMan",            
-                   kernel = k1matern5_2Fun,
+k1Matern5_2 <- new("covMan",            
+                   kernel = k1FunMatern5_2,
+                   hasGrad = TRUE, 
+                   acceptMatrix = FALSE,   
                    label = "Matern nu = 5/2",
                    d = 1L,
-                   inputNames = NULL,
-                   parLower = c("range" = 0.0, "var" = 0.0),
+                   inputNames = "x",
+                   parLower = c("range" = 1e-8, "var" = 1e-8),
                    parUpper = c("range" = Inf, "var" = Inf),
                    par = c("range" = 1.0, "var" = 1.0),
                    parN = 2L,
                    kernParNames = c("range", "var"))
 
-k1powExp <- new("covMan",            
-                kernel = k1powExpFun,
+k1PowExp <- new("covMan",            
+                kernel = k1FunPowExp,
+                hasGrad = TRUE, 
+                acceptMatrix = FALSE,   
                 label = "power exponential",
                 d = 1L,
-                inputNames = NULL,
-                parLower = c("range" = 0.0, "shape" = 0.0, "var" = 0.0),
+                inputNames = "x",
+                parLower = c("range" = 1e-8, "shape" = 0.0, "var" = 1e-8),
                 parUpper = c("range" = Inf, "shape" = 2.0, "var" = Inf),
                 par = c("range" = 1.0, "shape" = 1.5, "var" = 1.0),
                 parN = 3L,
@@ -76,4 +86,4 @@ k1powExp <- new("covMan",
 
 setAs("covMan", "function", function(from) from@kernel)
 
-GPkernNames <- c("k1exp", "k1matern3_2", "k1matern5_2", "k1powExp", "k1gauss")
+GPkernNames <- c("k1Exp", "k1Matern3_2", "k1Matern5_2", "k1PowExp", "k1Gauss")

@@ -2,13 +2,14 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{covAll-class}
-\alias{inputNames,covAll-method}
+%%\alias{inputNames,covAll-method}
 \alias{checkX,covAll,matrix-method}
+\alias{checkX,covAll,data.frame-method}
 %% \alias{npar,covAll-method}
-\alias{simulPar,covAll-method}
+%% \alias{simulPar,covAll-method}
 
 
-\title{Virtual class "covAll" }
+\title{Virtual Class \code{"covAll"}}
 \description{
 
   Virtual class \code{"covAll"}, union of classes including
@@ -20,12 +21,20 @@
   \describe{
     \item{checkX}{
       
-      \code{signature(object = "covAll", X = "matrix")}: checks the compatibility of a design with a given covariance object.
+      \code{signature(object = "covAll", X = "matrix")}: checks the
+      compatibility of a design with a given covariance object.
+
+    }
+    \item{checkX}{
+      
+      \code{signature(object = "covAll", X = "data.frame")}: checks the
+      compatibility of a design with a given covariance object.
 
     }
     \item{inputNames}{
 
-      \code{signature(object = "covAll")}: returns the character vector of input names.
+      \code{signature(object = "covAll")}: returns the character
+      vector of input names.
 
     }
     \item{simulPar}{

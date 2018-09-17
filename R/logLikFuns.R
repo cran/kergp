@@ -26,13 +26,15 @@
     n <- length(y)
     lpar <- length(par)
     
-    if (trace) print(par)
-    
+    if (trace > 1) print(par)
+
+    if (any(is.na(par))) return(NA)
+         
     if (noise){
         lparNN <- lpar - 1L
         ## 'if' added by Yves on 2013-08-26
-        if ( any( par[-lpar] < coefLower(object) ) ||
-            any( par[-lpar] > coefUpper(object) )  ||
+        if (any(par[-lpar] < coefLower(object)) ||
+            any(par[-lpar] > coefUpper(object))  ||
             par[lpar] < 0 ) {
             return(NA) 
         }
@@ -60,7 +62,7 @@
     
     L <- try(chol(C))
     if (inherits(L, "try-error")) {
-        if (trace) cat ("chol error\n")
+        if (trace > 1) cat ("chol error\n")
         return(NA)
     }
     L <- t(L)
@@ -117,7 +119,7 @@
         attr(logLik, "gradient") <- logLik.derivative
     }
     
-    if (trace) {
+    if (trace > 1L) {
         cat("logLik = ", logLik[1], "\n")
         if (compGrad) cat("*** grad ***", attr(logLik, "gradient"), "***\n")
     }

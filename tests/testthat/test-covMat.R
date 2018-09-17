@@ -1,9 +1,5 @@
-library(testthat)
-library(kergp)
-
-set.seet(314159)
 myCov <- covTS(inputs = c("Temp", "Humid", "Press"),
-               kernel = "k1powExp",
+               kernel = "k1PowExp",
                dep = c(range = "cst", shape = "cst"),
                value = c(shape = 1.8, range = 1.1))
 n <- 100; X <- matrix(runif(n*3), nrow = n, ncol = 3)

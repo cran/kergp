@@ -2,10 +2,12 @@
 \docType{methods}
 \alias{parMap,covTS-method}
 \title{
-  Map the parameters of a structure on the inputs and kernel parameters
+  Map the Parameters of a Structure on the Inputs and Kernel Parameters
 }
 \description{
+  
   Map the parameters of a structure on the inputs and kernel parameters.
+
 }
 \usage{
 \S4method{parMap}{covTS}(object, ...)
@@ -13,10 +15,14 @@
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{
+
     An object with class \code{"covTS"}.
+
   }
   \item{\dots}{
+
     Not used yet.
+
   }
 }
 %%\details{}
@@ -39,7 +45,7 @@
 }
 %%\seealso{}
 \examples{
-myCov <- covTS(d = 3, kernel = "k1gauss",
+myCov <- covTS(d = 3, kernel = "k1Gauss",
                dep = c(range = "input"), value = c(range = 1.1))
 parMap(myCov)
 }

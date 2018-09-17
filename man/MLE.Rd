@@ -2,8 +2,8 @@
 \alias{mle}
 
 \title{
-  Generic function for Maximum Likelihood estimation of a Gaussian Process
-  model
+  Generic Function: Maximum Likelihood Estimation of a Gaussian Process
+  Model
 }
 
 \description{

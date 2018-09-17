@@ -1,7 +1,3 @@
-library(testthat)
-library(kergp)
-
-
 ## copied from DiceKriging
 branin <- function (x) {
     x1 <- x[1] * 15 - 5

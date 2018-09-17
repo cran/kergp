@@ -97,10 +97,6 @@ predictOUG <- function(newt, t, y,
     
 }
 
-library(testthat)
-library(kergp)
-set.seed(1234)
-
 n <- 4
 newn <- 100 ## 100000 would not be a problem here
 t <- sort(runif(n))
@@ -116,7 +112,7 @@ res <- predictOUG(newt = newt, t = t, y = y, alpha = alpha, sigma = sigma,
 myCoef <- c(range = 1 / alpha, var = sigma^2 / alpha / 2)
 
 myExp <- covMan(
-  kernel = k1exp@kernel,
+  kernel = k1Exp@kernel,
   hasGrad = TRUE,
   d = 1,
   inputs = "t",

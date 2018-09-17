@@ -100,9 +100,11 @@
   }
 }
 \section{Methods}{
+
   \describe{
-    %    \item{checkX}{\code{signature(object = "covMan", X = "matrix")}:
-    %      check the compatibility of a \code{covMan} object and a design matrix. }
+    %    \item{checkX}{\code{signature(object = "covMan", X =
+    %      "matrix")}: check the compatibility of a \code{covMan} object
+    %      and a design matrix. }
     \item{coef<-}{
       
       \code{signature(object = "covMan")}: replace the whole vector of
@@ -123,13 +125,16 @@
     }
     \item{coef}{
 
-      \code{signature(object = "covMan")}: extracts the numeric values of the covariance parameters. 
-      %an ersatz of the \code{covMatrix} method, with slightly different parameters and use.
+      \code{signature(object = "covMan")}: extracts the numeric values
+      of the covariance parameters.
+      %an ersatz of the \code{covMatrix} method, with slightly different
+      %parameters and use.
 
     }
     \item{coefUpper<-}{
 
-      \code{signature(object = "covMan")}: replacement method for upper bounds on covMan coefficients.
+      \code{signature(object = "covMan")}: replacement method for upper
+      bounds on covMan coefficients.
 
     }
     \item{coefUpper}{
@@ -139,17 +144,21 @@
     }
     \item{covMat}{
 
-      \code{signature(object = "covMan")}: builds the covariance matrix or the cross covariance matrix between two sets of locations for a \code{covMan} object.
+      \code{signature(object = "covMan")}: builds the covariance matrix
+      or the cross covariance matrix between two sets of locations for a
+      \code{covMan} object.
 
     }
     \item{scores}{
 
-      \code{signature(object = "covMan")}: computes the scores (derivatives of the log-likelihood w.r.t. the covariance parameters.
+      \code{signature(object = "covMan")}: computes the scores
+      (derivatives of the log-likelihood w.r.t. the covariance
+      parameters.
 
     }
     \item{show}{
 
-      \code{signature(object = "covMan")}: prints in a custom format
+      \code{signature(object = "covMan")}: prints in a custom format.
 
     }
 %    \item{kernelName}{\code{signature(object = "covMan")}: return the
@@ -169,7 +178,8 @@
   
   While the \code{coef<-} replacement method is typically intended for
   internal use during likelihood maximization, the \code{coefLower<-}
-  and \code{coefUpper<-} replacement methods can be used when some information is available on the possible values of the parameters.
+  and \code{coefUpper<-} replacement methods can be used when some
+  information is available on the possible values of the parameters.
 
 }
 \seealso{

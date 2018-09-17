@@ -2,7 +2,8 @@
 
 double C_covWhiteNoise(const double *x1, const int *n1, 
                        const double *x2, const int *n2, 
-                       const int *d, const int *i1, const int *i2, 
+                       const int *d, 
+		       const int *i1, const int *i2, 
                        const double *var) {
   double s = 0.;
   for (int k = 0; k < *d; k++) {

@@ -3,7 +3,7 @@
 
 \title{
 
-  Diagnostic plot for the validation of a \code{gp} object
+  Diagnostic Plot for the Validation of a \code{gp} Object
 
 }
 

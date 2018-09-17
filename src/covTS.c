@@ -59,10 +59,10 @@ SEXP covMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   
   if (!isFunction(fun)) error("'fun' must be a function");
   if (!isMatrix(Xt)) error("'Xt' must be a matrix");
-  if(!isEnvironment(rho)) error("'rho' should be an environment");
+  if (!isEnvironment(rho)) error("'rho' should be an environment");
   
   /* find the number of rows and cols in 'X'  */
-  Xt = coerceVector(Xt, REALSXP);
+  PROTECT(Xt = coerceVector(Xt, REALSXP));
   PROTECT(dimXt = getAttrib(Xt, R_DimSymbol));
   d = INTEGER(dimXt)[0];
   n = INTEGER(dimXt)[1]; 
@@ -216,7 +216,7 @@ SEXP covMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 
     // set the gradient attribute of 'Cov'.
     SET_ATTR(Cov, attrNm, dCov);
-    UNPROTECT(11);
+    UNPROTECT(12);
     return(Cov);
     
   } else {
@@ -261,7 +261,7 @@ SEXP covMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 	rCov[i + j * n] = rCov[j + i * n];
       }
     }
-    UNPROTECT(8);
+    UNPROTECT(9);
     return(Cov);
     
   }
@@ -295,15 +295,15 @@ SEXP covMatMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   if (!isFunction(fun)) error("'fun' must be a function");
   if (!isMatrix(X1t)) error("'X1t' must be a matrix"); 
   if (!isMatrix(X2t)) error("'X2t' must be a matrix");
-  if(!isEnvironment(rho)) error("'rho' should be an environment");
+  if (!isEnvironment(rho)) error("'rho' should be an environment");
   
   /* find the number of rows and cols in 'X'  */
-  X1t = coerceVector(X1t, REALSXP);
+  PROTECT(X1t = coerceVector(X1t, REALSXP));
   PROTECT(dimX1t = getAttrib(X1t, R_DimSymbol));
   d = INTEGER(dimX1t)[0];
   n1 = INTEGER(dimX1t)[1];
  
-  X2t = coerceVector(X2t, REALSXP);
+  PROTECT(X2t = coerceVector(X2t, REALSXP));
   PROTECT(dimX2t = getAttrib(X2t, R_DimSymbol));
   if (INTEGER(dimX2t)[0] != d) {
     error("'X1t' and 'X2t must have the same number of rows (number of inputs)");
@@ -392,8 +392,168 @@ SEXP covMatMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
       
     }
 
-    UNPROTECT(9);
+    UNPROTECT(11);
     return(Cov);
+    
+  }
+
+}
+
+/*============================================================================*
+ * AUTHOR                                                                     *
+ *                                                                            *
+ *    Yves Deville <deville.yves@alpestat.com>                                *
+ *                                                                            *
+ * DESCRIPTION                                                                *
+ *                                                                            *
+ * Compute (/update in the future)  the variance vector 'Var' by adding the   *
+ * contribution of a 'covTS'  additive term.                                  * 
+ *                                                                            *
+ *                                                                            *
+ *       sum_{ell = 1}^d  K_1( x_{i, ell}, x_{i, ell}; theta_ell )            *
+ *                                                                            *
+ * where K1 is some one-dimensional covariance kernel depending on a vector   *
+ * 'theta' of 'p' parameters. The total number of parameter for the d-dimen-  *
+ * -sional kernel is 'npar' and falls between 1 and  p * d.                   *
+ *                                                                            *
+ * See the explanations for the function 'covMat_covTS' in this file          *
+ *============================================================================*/
+
+SEXP varVec_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
+		  SEXP Xt,       // Transpose of the spatial design : d*n
+		  SEXP par,      // vector of 'npar' param for the Kd kernel
+		  SEXP parMap,   // TRANSPOSE of the Kd mapping : d * npar
+		  SEXP compGrad, // Integer 0 or 1: compute gradient matrix?
+		  SEXP index,    // Index for grad.
+		  SEXP rho) {    // An R environment
+  
+  int  i, k, ell, n, d, p, npar, *iparMap = INTEGER(parMap),  ipoint;
+  
+  double *rxt = REAL(Xt), *rx1_ell, *rVar, 
+    *rpar = REAL(par), *rpar_ell;
+  
+  SEXP dimXt, dimParMap, R_fcall, Var, x1_ell, par_ell;
+  
+  if (!isFunction(fun)) error("'fun' must be a function");
+  if (!isMatrix(Xt)) error("'Xt' must be a matrix");
+  if (!isEnvironment(rho)) error("'rho' should be an environment");
+  
+  /* find the number of rows and cols in 'X'  */
+  PROTECT(Xt = coerceVector(Xt, REALSXP));
+  PROTECT(dimXt = getAttrib(Xt, R_DimSymbol));
+  d = INTEGER(dimXt)[0];
+  n = INTEGER(dimXt)[1]; 
+
+  /* check the parameters arrays  */
+  npar = LENGTH(par);
+  par = coerceVector(par, REALSXP);
+  parMap = coerceVector(parMap, INTSXP);  // length npar * d
+  PROTECT(dimParMap = getAttrib(parMap, R_DimSymbol));
+  p = INTEGER(dimParMap)[0];
+
+  PROTECT(Var = allocVector(REALSXP, n));
+  PROTECT(x1_ell = allocVector(REALSXP, 1)); // one-dim sites x1
+  PROTECT(par_ell = allocVector(REALSXP, p));
+
+  rVar = REAL(Var);
+  rx1_ell = REAL(x1_ell);
+  rpar_ell = REAL(par_ell);
+
+  PROTECT(R_fcall = lang4(fun, x1_ell, x1_ell, par_ell));
+  
+  // FOR FUTURE IMPLEMENTATION: grad flag could be passed to the 1d kernel in
+  // order to save time when no derivation is required.
+  
+  // initialize 
+  for (i = 0; i < n; i++) { 
+    rVar[i] = 0.0;
+  }
+  
+  if ( INTEGER(compGrad)[0] ) {
+    
+    SEXP dVar, kernValue, dkernValue, attrNm;
+    double *rdVar;
+    int iindex, ipointGrad;
+
+    iindex = INTEGER(index)[0];
+    
+    PROTECT(dVar = allocMatrix(REALSXP, n, 1)); //allocate the n x 1 matrix
+    PROTECT(kernValue = allocVector(REALSXP, 1));
+    PROTECT(dkernValue = allocVector(REALSXP, p));
+    
+    PROTECT(attrNm = NEW_CHARACTER(1));
+    SET_STRING_ELT(attrNm, 0, mkChar("gradient"));
+    rdVar = REAL(dVar);
+    
+    // initialize
+    for (i = 0; i < n; i++) { 
+	rdVar[i] = 0.0;
+    }
+
+    for (ell = 0; ell < d; ell++) {
+
+      // o select parameter vector for dim 'ell',
+      // o watch for a required derivation (ipoint == iindex))
+      // o fill the vector 'rpar_ell' representing 'theta_ell'
+      ipointGrad = -1;
+
+      for (k = 0; k < p; k++) {
+	ipoint = iparMap[ell * p + k];
+	if (ipoint == iindex) ipointGrad = k;
+	rpar_ell[k] = rpar[ipoint];
+      }
+
+      SETCADDDR(R_fcall, par_ell);
+
+      if (ipointGrad >= 0) {
+	// the parameter for dim 'ell' depends on par[iindex]: derivation.
+	for (i = 0; i < n; i++) {
+	  rx1_ell[0] = rxt[i * d + ell];
+	  SETCADR(R_fcall, x1_ell);
+	  SETCADDR(R_fcall, x1_ell);
+	  kernValue = eval(R_fcall, rho);
+	  rVar[i] += REAL(kernValue)[0];
+	  dkernValue = GET_ATTR(kernValue, attrNm);
+	  rdVar[i] += REAL(dkernValue)[ipointGrad];
+
+	}
+
+      } else {
+	for (i = 0; i < n; i++) {
+	  // the parameter for dim 'ell' does not depend on  par[iindex]
+	  rx1_ell[0] = rxt[i * d + ell];
+	  SETCADR(R_fcall, x1_ell);
+	  SETCADDR(R_fcall, x1_ell);
+	  kernValue = eval(R_fcall, rho);
+	  rVar[i] += REAL(kernValue)[0];    
+	  
+	}
+      }
+    }
+    // set the gradient attribute of 'Var'.
+    SET_ATTR(Var, attrNm, dVar);
+    UNPROTECT(11);
+    return(Var);
+    
+  } else {
+
+    for (ell = 0; ell < d; ell++) {
+      // select parameter vector for dim 'ell' 
+      for (k = 0; k < p; k++) {
+	ipoint = iparMap[ell * p + k];
+	rpar_ell[k] = rpar[ipoint];
+      }
+      SETCADDDR(R_fcall, par_ell);
+      for (i = 0; i < n; i++) {
+	rx1_ell[0] = rxt[i * d + ell];
+	SETCADR(R_fcall, x1_ell);
+	SETCADDR(R_fcall, x1_ell);
+	rVar[i] += REAL(eval(R_fcall, rho))[0];
+      }
+      
+    }
+    UNPROTECT(7);
+    return(Var);
     
   }
 

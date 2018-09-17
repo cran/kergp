@@ -43,7 +43,7 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   if(!isEnvironment(rho)) error("'rho' should be an environment");
   
   /* find the number of rows and cols in 'X'  */
-  Xt = coerceVector(Xt, REALSXP);
+  PROTECT(Xt = coerceVector(Xt, REALSXP));
   PROTECT(dimXt = getAttrib(Xt, R_DimSymbol));
   d = INTEGER(dimXt)[0];
   n = INTEGER(dimXt)[1]; 
@@ -54,9 +54,9 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 #endif 
   
   /* check the parameters arrays  */
+  PROTECT(par = coerceVector(par, REALSXP));
   npar = LENGTH(par);
-  par = coerceVector(par, REALSXP);
-  
+
 #ifdef DEBUG 
   for (ipar = 0; ipar < npar; ipar++) {
     Rprintf("par[%d] = %7.3f  ", ipar, rpar[ipar]);
@@ -64,7 +64,7 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   Rprintf("\n");
 #endif
 
-  weights = coerceVector(weights, REALSXP);
+  PROTECT(weights = coerceVector(weights, REALSXP));
   if (LENGTH(weights) != m) {
     error("vector 'weights' on input with bad length");
   }
@@ -118,7 +118,7 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
     }
   }
 
-  UNPROTECT(6);
+  UNPROTECT(9);
   return(scores);
 
 }

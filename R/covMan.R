@@ -33,9 +33,14 @@ covMan <- function(kernel,
                    d = length(inputs),
                    parNames,
                    par = NULL,
+                   parLower = NULL,
+                   parUpper = NULL,
                    label = "covMan", ...) {
     
   if (is.null(par)) par <- as.numeric(rep(NA, length(parNames)))
+  if (is.null(parLower)) parLower <- as.numeric(rep(-Inf, length(parNames)))
+  if (is.null(parUpper)) parUpper <- as.numeric(rep(Inf, length(parNames)))
+  
   if (missing(d) & missing(inputs)) stop("at least one of 'd' or 'inputs' must be provided")
   if (length(inputs) != d) stop("'d' must be equal to 'length(inputs)'")
   
@@ -48,6 +53,8 @@ covMan <- function(kernel,
       inputNames = as.character(inputs),
       kernParNames = as.character(parNames),
       par = as.numeric(par),
+      parLower = as.numeric(parLower),
+      parUpper = as.numeric(parUpper),
       parN = length(par),    
       ...)
   
@@ -60,7 +67,7 @@ setMethod("covMat",
                                 checkNames = NULL, index = -1L, ...) {
 
               isXnew <- !is.null(Xnew)
-              X <- as.matrix(X)
+              ## X <- as.matrix(X)
               
               if (is.null(checkNames)) {
                   checkNames <- TRUE 
@@ -75,7 +82,7 @@ setMethod("covMat",
               if (any(is.na(X))) stop("'X' must not contain NA elements")
 
               if (isXnew){
-                  Xnew <- as.matrix(Xnew)
+                  ## Xnew <- as.matrix(Xnew)
                   if (checkNames) Xnew <- checkX(object, X = Xnew)
                   if (ncol(X) != ncol(Xnew)) stop("'X' and 'Xnew' must have the same number of columns")
                   if (any(is.na(Xnew))) stop("'Xnew' must not contain NA elements") 
@@ -89,6 +96,12 @@ setMethod("covMat",
                   return(Cov)
               }
               
+              if (compGrad) {
+                  if ((index < 1L) || (index > object@parN)) {
+                      warning("Bad index passed to 'covMat' with 'gradComp = TRUE'. ",
+                              "Setting 'gradComp' to FALSE.")
+                  }
+              }
               compGrad <- as.integer(compGrad)
               index <- as.integer(index) - 1L
               par <- coef(object)  
@@ -97,14 +110,88 @@ setMethod("covMat",
               environment(kernFun) <- rho        
               if (!isXnew){
                   Cov <- .Call("covMat_covMan", kernFun, t(X), par, 
-                               compGrad, index, rho, PACKAGE = "kergp")
+                               compGrad, index, rho)
               } else { 
-                  if (compGrad) stop("Gradient computation not implemented when Xnew!=NULL")
+                  if (compGrad) stop("Gradient computation not implemented when Xnew != NULL")
                   Cov <- .Call("covMatMat_covMan", kernFun, t(X), t(Xnew), par, 
-                               compGrad, index, rho, PACKAGE = "kergp")
+                               compGrad, index, rho)
               }          
               return(Cov) 
               
+          })
+
+## *************************************************************************
+## 'varVec' method: compute the variance vector.
+setMethod("varVec",
+          signature = "covMan", 
+          definition = function(object, X, compGrad = FALSE, 
+                                checkNames = NULL, index = -1L, ...) {
+              
+              if (is.null(checkNames)) {
+                  checkNames <- TRUE 
+                  if (object@d == 1L) {
+                      if (ncol(X) == 1L) {
+                          checkNames <- FALSE
+                      }  
+                  }      
+              }
+              
+              if (checkNames) X <- checkX(object, X = X)
+              if (any(is.na(X))) stop("'X' must not contain NA elements")
+              
+              if (object@acceptMatrix){
+
+                  myVar <- function(x) {
+                      x <- matrix(x, ncol = object@d)
+                      object@kernel(x, x, par = object@par)
+                  }
+                  
+                  Var <- apply(X, MARGIN = 1, myVar)
+
+                  
+                  if (!compGrad) attr(Var, "gradient") <- c()
+                  else {
+                      ## XXX
+                      ## extract diagonal, but gradient can be a list or an array
+                      warning("when 'acceptMatrix' is TRUE, 'compGrad = TRUE' not yet ",
+                              "allowed. Coming soon.")
+                  }
+                  return(Var)
+              }
+              
+              if (compGrad) {
+                  if ((index < 1L) || (index > object@parN)) {
+                      warning("Bad index passed to 'covMat' with 'gradComp = TRUE'. ",
+                              "Setting 'gradComp' to FALSE.")
+                  }
+              }
+              compGrad <- as.integer(compGrad)
+              index <- as.integer(index) - 1L
+              par <- coef(object)  
+              kernFun <- object@kernel
+              rho <- new.env()
+              environment(kernFun) <- rho        
+              Var <- .Call("varVec_covMan", kernFun, t(X), par, 
+                           compGrad, index, rho)
+              
+              return(Var) 
+              
+          })
+
+## *************************************************************************
+##' npar method for class "covMan".
+##'
+##' npar method for the "covMan" class
+##'
+##' @param object An object with class "covMan"
+##' @return The number of free parmaeters in a covTS covariance.
+##' @docType methods
+##' @rdname covMan-methods
+##'
+setMethod("npar",
+          signature = signature(object = "covMan"),
+          definition = function(object,  ...){
+            object@parN
           })
 
 ## setMethod("sd2",
@@ -171,7 +258,7 @@ setMethod("coefLower<-",
           signature = signature(object = "covMan"),
           definition = function(object, ..., value){
             if (length(value) != object@parN) {
-              stop(sprintf("'value' must have length %d", npar(object)))
+              stop(sprintf("'value' must have length %d", object@parN))
             }
             object@parLower[] <- value
             object   
@@ -187,7 +274,7 @@ setMethod("coefUpper<-",
           signature = signature(object = "covMan"),
           definition = function(object, ..., value){
             if (length(value) != object@parN) {
-              stop(sprintf("'value' must have length %d", npar(object)))
+              stop(sprintf("'value' must have length %d", object@parN))
             }
             object@parUpper[] <- value
             object   
@@ -219,28 +306,38 @@ setMethod("scores",
             npar <- length(par)
             
             ## DO SOME MORE CHECKS HERE
+            ## Yves 2016-10-13: added the possibility of an attribute which is
+            ## array rather than list. More convenient when 'npar' is large.
 
             if (object@acceptMatrix){
                 dCov <- attr(object@kernel(X, X, coef(object)), "gradient")
-                scores <- rep(NA, npar)          
-                for (i in 1:npar){
-                    dC <- as.numeric(dCov[[i]][lower.tri(dCov[[i]], diag = TRUE)]) 
-                    scores[i] <- sum(weights * dC)
+                if (is.list(dCov)) {
+                    ## with a list 
+                    scores <- rep(NA, npar)          
+                    for (i in 1:npar){
+                        dC <- as.numeric(dCov[[i]][lower.tri(dCov[[i]], diag = TRUE)]) 
+                        scores[i] <- sum(weights * dC)
+                    }
+                    return(scores)
+                } else if (is.array(dCov)) {
+                    ## with array rather than list
+                    if (any(dim(dCov) != c(n, n, npar))) {
+                        stop("\"gradient\" attribute with wrong dimension")  
+                    }
+                    lt <- lower.tri(matrix(NA, nrow = n , ncol = n), diag = TRUE)
+                    agFun <- function(mat) sum(weights * mat[lt])
+                    scores <- apply(dCov, MARGIN = 3L, FUN = agFun)
+                    return(scores)
+                } else {
+                    stop("the \"gradient\" attribute must be a list or an array")  
                 }
-                return(scores)
-                ## with array rather than list we would use something like...
-                ## 
-                ## lt <- lower.tri(matrix(NA, nrow = n , ncol = n), diag = TRUE)
-                ## agFun <- function(mat) sum(weights * mat[lt])
-                ## scores <- apply(attr(object@kernel(X, X, coef(object)), "gradient"),
-                ##                 MARGIN = 1, FUN = agFun)
+                
             }
             
             kernFun <- object@kernel
             rho <- new.env()
             environment(kernFun) <- rho
-            scores <- .Call("scores_covMan", kernFun, t(X), par, weights, rho,
-                            PACKAGE = "kergp")
+            scores <- .Call("scores_covMan", kernFun, t(X), par, weights, rho)
             
           })
 
@@ -249,8 +346,8 @@ setMethod("scores",
 ## It should also provide information of the parameterisation of the
 ## structure itself (sharing of the parameters across inputs).
 ##
-##' show method for class "TS"
-##' @aliases show,covTS-method
+##' show method for class "covMan"
+##' @aliases show,covMan-method
 ##'
 ##' @param object XXX
 ##' @docType methods
@@ -278,7 +375,10 @@ setMethod("show",
                 cat("o Analytical gradient is provided.\n")
             }
             cat("o Param. values: \n")
-            co <- as.matrix(coef(object), nrow=1)
-            colnames(co) <- "Value"
+            co <- cbind(coef(object), coefLower(object), coefUpper(object))
+            colnames(co) <- c("Value", "Lower", "Upper")
             print(co)
           })
+
+
+

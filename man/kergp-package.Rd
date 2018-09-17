@@ -25,13 +25,7 @@
 }
 
 \details{
-\tabular{ll}{
-  Package: \tab kergp\cr
-  Type: \tab Package\cr
-  Version: \tab 0.2.0\cr
-  Date: \tab 2015-12-22\cr
-  License: \tab GPL-3\cr
-}
+  \packageDESCRIPTION{kergp}
 }
 
 \section{Warning}{
@@ -109,7 +103,8 @@ kernFun <- function(x1, x2, par) {
 
 ## ---------------------------------------------------------------
 ## quicker: with Rcpp; see also an example  with package inline
-## in "gp" doc. file
+## in "gp" doc. file. Note that the Rcpp "sugar" fucntions are
+## vectorized, so no for loops is required.
 ## ---------------------------------------------------------------
 
 \dontrun{
@@ -180,12 +175,13 @@ title("GRF Simulation")
 
 
 ## -- Fit the Gaussian process model (trend + covariance parameters) -- 
-
+covSymGauss
 symgp <- gp(formula = y ~ 1, data = data.frame(y, X),
             inputs = names(X),
             cov = covSymGauss,
             parCovIni = c(0.1, 2),
-            varNoiseLower = 1e-8, varNoiseUpper = 1e-8)
+            varNoiseIni = 1.0e-8,
+            varNoiseLower = 0.9e-8, varNoiseUpper = 1.1e-8)
 
 # mind that the noise is not a symmetric kernel
 # so varNoiseUpper should be chosen as small as possible.

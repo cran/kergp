@@ -2,7 +2,7 @@
 \alias{kernelName}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  Name of the 1d kernel in a composite kernel object
+  Name of the One-Dimensional Kernel in a Composite Kernel Object
 }
 \description{
   Name of the 1d kernel in a composite kernel object. 

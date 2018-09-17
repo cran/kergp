@@ -53,11 +53,14 @@ setMethod("gls",
                   FStarPlus <- forwardsolve(L, cbind(F, y))
                   qrFStarPlus <- qr(FStarPlus)
                   RStarPlus <- qr.R(qrFStarPlus)
-                  if (length(beta)>0){
+                  if (length(beta) > 0){
+                      if (p != length(beta)) stop("'beta' and 'F' mismatch")
+                      trendKnown <- TRUE
                       betaHat <- beta
                       eStar <- FStarPlus %*% (rbind(-as.matrix(betaHat), 1))
-                      sseStar <- crossprod(eStar, eStar)
+                      sseStar <- crossprod(eStar)
                   } else {
+                      trendKnown <- FALSE
                       betaHat <- backsolve(RStarPlus[1L:p, 1L:p], RStarPlus[1L:p,  p1])  
                       eStar  <- qr.Q(qrFStarPlus)[ , p1] * RStarPlus[p1, p1]
                       sseStar <- RStarPlus[p1, p1]^2
@@ -67,19 +70,21 @@ setMethod("gls",
               } else {
                   betaHat <-  NULL
                   eStar <- forwardsolve(L, y)
-                  sseStar <- crossprod(eStar, eStar)
+                  sseStar <- crossprod(eStar)
                   FStar <- NULL
                   RStar <- NULL
               }
               names(betaHat) <- colnames(F)
               
-              return(list(betaHat = betaHat,    ## estimate
-                   L = L,                ## Cholesky Lower root of C 
-                   eStar = eStar,        ## inv(L) %*% error
-                   sseStar = sseStar,    ## t(eStar) %*% eStar
-                   FStar = FStar,        ## inv(L) %*% F
-                   RStar = RStar,        ## qr.r(FStar)
-                   noise = noise,
-                   varNoise = varNoise))  ## copy
+              return(list(betaHat = betaHat,       ## estimate
+                          L = L,                   ## Cholesky Lower root of C 
+                          eStar = eStar,           ## inv(L) %*% error
+                          sseStar = sseStar,       ## t(eStar) %*% eStar
+                          FStar = FStar,           ## inv(L) %*% F
+                          RStar = RStar,           ## qr.r(FStar)
+                          noise = noise,  
+                          varNoise = varNoise,     ## copy
+                          trendKnown = trendKnown  ## added by YD
+                          ))   
           }
           )

@@ -3,7 +3,7 @@
 \encoding{UTF8}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  Creator function for covTS objects
+  Creator Function for \code{covTS} Objects
 }
 \description{
   
@@ -13,7 +13,7 @@
 }
 \usage{
 covTS(inputs = paste("x", 1:d, sep = ""),
-      d = length(inputs), kernel = "k1matern5_2",
+      d = length(inputs), kernel = "k1Matern5_2",
       dep = NULL, value = NULL, var = 1, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -87,24 +87,24 @@ covTS(inputs = paste("x", 1:d, sep = ""),
 
     \emph{name} \tab \emph{description} \tab \eqn{p} \tab \emph{par. names} \cr
 
-    \code{k1exp} \tab exponential \tab \eqn{2} \tab \code{range},
+    \code{k1Exp} \tab exponential \tab \eqn{2} \tab \code{range},
     \code{var}\cr
 
-    \code{k1matern3_2} \tab Matérn \eqn{\nu = 3/2} \tab \eqn{2} \tab
+    \code{k1Matern3_2} \tab Matérn \eqn{\nu = 3/2} \tab \eqn{2} \tab
     \code{range}, \code{var} \cr
 
-    \code{k1matern5_2} \tab Matérn \eqn{\nu = 5/2}\tab \eqn{2} \tab
+    \code{k1Matern5_2} \tab Matérn \eqn{\nu = 5/2}\tab \eqn{2} \tab
     \code{range}, \code{var} \cr 
 
-    \code{k1powExp} \tab power exponential \tab \eqn{3} \tab \code{range},
+    \code{k1PowExp} \tab power exponential \tab \eqn{3} \tab \code{range},
     \code{shape}, \code{var} \cr
 
-    \code{k1gauss} \tab gaussian or "square exponential" \tab \eqn{2} \tab
+    \code{k1Gauss} \tab gaussian or "square exponential" \tab \eqn{2} \tab
     \code{range}, \code{var} \cr
 
   }
 
-  Note that the exponential kernel of \code{k1exp} is identical to the
+  Note that the exponential kernel of \code{k1Exp} is identical to the
   Matérn kernel for \eqn{\nu = 1/2}, and that the three Matérns kernels
   provided here for \eqn{\nu = 1/2}, \eqn{\nu = 3/2} and \eqn{\nu = 5/2}
   are special cases of Continuous AutoRegressive (CAR) process
@@ -144,7 +144,7 @@ covTS(inputs = paste("x", 1:d, sep = ""),
 }
 %%\seealso{}
 \examples{
-myCov1 <- covTS(kernel = "k1exp", inputs = c("v1", "v2", "v3"),
+myCov1 <- covTS(kernel = "k1Exp", inputs = c("v1", "v2", "v3"),
                 dep = c(range = "input"))
 coef(myCov1) <- c(range = c(0.3, 0.7, 0.9), sigma2 = c(2, 2, 8))
 
@@ -155,12 +155,12 @@ coef(myCov1, as = "list")
 coef(myCov1, as = "matrix", type = "range")
 
 # with a common range parameter
-myCov2 <- covTS(kernel = "k1exp", inputs = c("v1", "v2", "v3"), 
+myCov2 <- covTS(kernel = "k1Exp", inputs = c("v1", "v2", "v3"), 
                 dep = c(range = "cst"), value = c(range = 0.7),
                 var = c(2, 2, 8))
 myCov2
 
-myCov3 <- covTS(d = 3, kernel = "k1powExp",
+myCov3 <- covTS(d = 3, kernel = "k1PowExp",
                 dep = c(range = "cst", shape = "cst"),
                 value = c(shape = 1.8, range = 1.1),
                 var = c(2, 2, 8))

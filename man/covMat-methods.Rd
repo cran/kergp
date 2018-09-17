@@ -5,7 +5,7 @@
 %% \alias{covMat,covManVec-method}
 \alias{covMat,covTS-method}
 \title{
-  Covariance Matrix for a covariance kernel object
+  Covariance Matrix for a Covariance Kernel Object
 }
 \description{
   
@@ -77,9 +77,9 @@
   A \eqn{n_1 \times n_2}{(n_1, n_2)} matrix with general element
   \eqn{C_{ij} :=
   K(\mathbf{x}_{1,i},\,\mathbf{x}_{2,j};\,\boldsymbol{\theta})}{C[i, j] = K(X1[i,
-  ], X2[j, ]), theta} where
+  ], X2[j, ], \theta)} where
   \eqn{K(\mathbf{x}_1,\,\mathbf{x}_2;\,\boldsymbol{\theta})}{K(x1, x2,
-  theta)} is the covariance kernel function.
+  \theta)} is the covariance kernel function.
 
 }
 %%\references{}
@@ -90,7 +90,7 @@
 }
 \note{
 
-  The value of the parameter \eqn{\boldsymbol{\theta}}{theta} can be
+  The value of the parameter \eqn{\boldsymbol{\theta}}{\theta} can be
   extracted from the object with the \code{coef} method.
 
 }
@@ -102,7 +102,7 @@
 }
 \examples{
 myCov <- covTS(inputs = c("Temp", "Humid", "Press"),
-               kernel = "k1powExp",
+               kernel = "k1PowExp",
                dep = c(range = "cst", shape = "cst"),
                value = c(shape = 1.8, range = 1.1))
 n <- 100; X <- matrix(runif(n*3), nrow = n, ncol = 3)

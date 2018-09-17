@@ -2,7 +2,7 @@
 \alias{gp}
 
 \title{
-  Gaussian Process model
+  Gaussian Process Model
 }
 
 \description{
@@ -13,7 +13,7 @@
 
 \usage{
 
-gp(formula, data, inputs, cov, estim = TRUE, ...)
+gp(formula, data, inputs = inputNames(cov), cov, estim = TRUE, ...)
 
 }
 
@@ -48,7 +48,7 @@ gp(formula, data, inputs, cov, estim = TRUE, ...)
     Maximum Likelihood. The initial values can then be specified using
     the \code{parCovIni} and \code{varNoiseIni} arguments of
     \code{\link{mle,covAll-method}} passed though \code{dots}. If
-    \code{FALSE}, a simple Generalised Least Squares estimation will be
+    \code{FALSE}, a simple Generalized Least Squares estimation will be
     used, see \code{\link{gls,covAll-method}}. Then the value of
     \code{varNoise} must be given and passed through \code{dots} in case
     \code{noise} is \code{TRUE}.
@@ -62,8 +62,8 @@ gp(formula, data, inputs, cov, estim = TRUE, ...)
     \code{\link{gls,covAll-method}} if \code{estim} is \code{FALSE}. In
     the first case, the arguments will typically include
     \code{varNoiseIni}. In the second case, they will typically include
-    \code{varNoise}. Note that a logical \code{noise} can be used in
-    the "mle" case. In both cases, the arguments \code{y}, \code{X},
+    \code{varNoise}. Note that a logical \code{noise} can be used in the
+    \code{"mle"} case. In both cases, the arguments \code{y}, \code{X},
     \code{F} can not be used since they are automatically passed.
 
   }
@@ -74,7 +74,8 @@ gp(formula, data, inputs, cov, estim = TRUE, ...)
   
   When \code{estim} is \code{TRUE}, the covariance object in \code{cov}
   is expected to provide a gradient when used to compute a covariance
-  matrix, since the default value of \code{compGrad} \code{\link{mle}}.  
+  matrix, since the default value of \code{compGrad} it \code{TRUE}, 
+  see \code{\link{mle,covAll-method}}.  
   
 }
 
@@ -93,7 +94,8 @@ gp(formula, data, inputs, cov, estim = TRUE, ...)
 
 \seealso{
 
-  \code{\link{mle}} for a detailed example.
+  \code{\link{mle,covAll-method}} for a detailed example of
+  maximum-likelihood estimation.
 
 }
 
@@ -103,7 +105,7 @@ gp(formula, data, inputs, cov, estim = TRUE, ...)
 ## ==================================================================
 set.seed(1234)
 myCov <- covTS(inputs = c("Temp", "Humid"),
-               kernel = "k1matern5_2",
+               kernel = "k1Matern5_2",
                dep = c(range = "input"),
                value = c(range = 0.4))
 ## change coefficients (variances)
@@ -113,17 +115,10 @@ d <- myCov@d; n <- 20
 X <- matrix(runif(n*d), nrow = n, ncol = d)
 colnames(X) <- inputNames(myCov)
 ## generate the GP realization
-C <- covMat(myCov, X = X)
-L <- t(chol(C))
-zeta <- L \%*\% rnorm(n)
-## GP modelling with constant mean
-F <- matrix(1, nrow = n, ncol = 1)
-varNoise <- 0.05
-epsilon <- rnorm(n, sd = sqrt(varNoise))
-beta <- 10
-y <- F \%*\% beta + zeta + epsilon
-## Towards prediction 
-fit <- gls(myCov, X = X, y = y, F = F, varNoise = varNoise)
+myGp <- gp(formula = y ~ 1, data = data.frame(y = rep(0, n), X), 
+            cov = myCov, estim = FALSE,
+            beta = 10, varNoise = 0.05)
+y <- simulate(myGp, cond = FALSE)$sim
 
 ## parIni: add noise to true parameters
 parCovIni <- coef(myCov)
@@ -131,8 +126,10 @@ parCovIni[] <- 0.9 * parCovIni[] +  0.1 * runif(length(parCovIni))
 coefLower(myCov) <- rep(1e-2, 4)
 coefUpper(myCov) <- c(5, 5, 20, 20)
 est <- gp(y ~ 1, data = data.frame(y = y, X),
-          inputs = colnames(X), cov = myCov, 
-          noise = TRUE, varNoiseLower = 1e-2, 
+          cov = myCov, 
+          noise = TRUE,
+          varNoiseLower = 1e-2,
+          varNoiseIni = 1.0,
           parCovIni = parCovIni) 
 summary(est)
 coef(est)
@@ -170,16 +167,15 @@ coef(est)
     dataVal <- data.frame(dataVal, y = apply(dataVal, 1, testfun))
 
     ## Creation of "CovTS" object with one range by input
-    myCov <- covTS(inputs = inputs, d = d, kernel = "k1matern3_2", 
+    myCov <- covTS(inputs = inputs, d = d, kernel = "k1Matern3_2", 
                    dep = c(range = "input"))
 
     ## Creation of a gp object
-    fitgp <- gp(formula = y ~ 1, data = dataFit, inputs = inputs,
+    fitgp <- gp(formula = y ~ 1, data = dataFit, 
                 cov = myCov, noise = TRUE, 
                 parCovIni = rep(1, 2*d),
                 parCovLower = c(rep(1e-4, 2*d)),
-                parCovUpper = c(rep(5, d), rep(10,d)),
-                control = list(maxit = 300, REPORT = 10))
+                parCovUpper = c(rep(5, d), rep(10,d)))
  
     predTS <- predict(fitgp, newdata = as.matrix(dataVal[ , inputs]), type = "UK")$mean
 
@@ -235,13 +231,13 @@ myGaussR <- covMan(kernel = myGaussFunR,
 
 ## -- The same, still in R, but with a kernel admitting matrices as arguments
 
-myGaussFunRVec <- function(X1, X2, par) { 
-    # X1, X2 : matrices with same number of columns 'd' (dimension)
-    n <- nrow(X1)
-    d <- ncol(X1)     
+myGaussFunRVec <- function(x1, x2, par) { 
+    # x1, x2 : matrices with same number of columns 'd' (dimension)
+    n <- nrow(x1)
+    d <- ncol(x1)     
     SS2 <- 0  
     for (j in 1:d){
-        Aj <- outer(X1[ , j], X2[ , j], "-")
+        Aj <- outer(x1[ , j], x2[ , j], "-")
         Hj2 <- (Aj / par[1])^2
         SS2 <- SS2 + Hj2
     }
@@ -315,11 +311,10 @@ X <- matrix(runif(n * d), nrow = n)
 colnames(X) <- inputNames(myGaussRVec)
 design <- data.frame(X)
 coef(myGaussRVec) <- myPar <- c(theta = 0.5, sigma2 = 2)
-C <- covMat(object = myGaussRVec, X = X,
-            compGrad = FALSE,  index = 1L, checkNames = FALSE)
-
-L <- t(chol(C))
-y <- L \%*\% rnorm(n)
+myGp <- gp(formula = y ~ 1, data = data.frame(y = rep(0, n), design), 
+            cov = myGaussRVec, estim = FALSE,
+            beta = 0, varNoise = 1e-8)
+y <- simulate(myGp, cond = FALSE)$sim
 F <- matrix(runif(n * p), nrow = n, ncol = p)
 beta <- (1:p) / p
 y <- tcrossprod(F, t(beta)) + y
@@ -327,7 +322,7 @@ y <- tcrossprod(F, t(beta)) + y
 ## == ML estimation. ==
 tRVec <- system.time(
     resRVec <- gp(formula = y ~ ., data = data.frame(y = y, design),
-                  inputs = names(design), cov = myGaussRVec,
+                  cov = myGaussRVec,
                   compGrad = TRUE, 
                   parCovIni = c(0.5, 0.5), varNoiseLower = 1e-4,
                   parCovLower = c(1e-5, 1e-5), parCovUpper = c(Inf, Inf))
@@ -342,7 +337,7 @@ coefAll <- coef(resRVec)
 \dontrun{
     tR <- system.time(
         resR <- gp(formula = y ~ ., data = data.frame(y = y, design),
-                   inputs = names(design), cov = myGaussR,
+                   cov = myGaussR,
                    compGrad = TRUE, 
                    parCovIni = c(0.5, 0.5), varNoiseLower = 1e-4,
                    parCovLower = c(1e-5, 1e-5), parCovUpper = c(Inf, Inf))
@@ -352,7 +347,7 @@ coefAll <- coef(resRVec)
     if (require(inline)) {
         tC <- system.time(
             resC <- gp(formula = y ~ ., data = data.frame(y = y, design),
-                       inputs = names(design), cov = myGaussC,
+                       cov = myGaussC,
                        compGrad = TRUE, 
                        parCovIni = c(0.5, 0.5), varNoiseLower = 1e-4,
                        parCovLower = c(1e-5, 1e-5), parCovUpper = c(Inf, Inf))

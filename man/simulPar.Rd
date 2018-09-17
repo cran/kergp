@@ -2,8 +2,8 @@
 \alias{simulPar}
 \title{
 
-  Generic function to draw random values for the parameters of a
-  covariance kernel
+  Generic function: Draw Random Values for the Parameters of a
+  Covariance Kernel
 
 }
 \description{

@@ -3,7 +3,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 %% \encoding{UTF8} If ecole des Mines.. 
 \title{
-  Diagnostics for a Gaussian Process model, based on Leave-One-Out
+  Diagnostics for a Gaussian Process Model, Based on Leave-One-Out
 }
 \description{
   

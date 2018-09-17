@@ -2,16 +2,17 @@
 \alias{predict.gp}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  Prediction method for the \code{"gp"} S3 class
+  Prediction Method for the \code{"gp"} S3 Class
 }
 \description{
   
   Prediction method for the \code{"gp"} S3 class.
-
+ 
 }
 \usage{
 
-\S3method{predict}{gp}(object, newdata, type, 
+\S3method{predict}{gp}(object, newdata,
+        type = ifelse(object$trendKnown, "SK", "UK"), 
         seCompute = TRUE, covCompute = FALSE,
         lightReturn = FALSE, biasCorrect = FALSE,
         forceInterp,        
@@ -135,8 +136,9 @@
   \item{c}{
 
     An auxiliary matrix \eqn{\mathbf{c}}{c}, containing all the
-    covariances between newdata and the initial design points. Not
-    returned if \code{lightReturn} is \code{TRUE}.
+    covariances between the points in \code{newdata} and those in the
+    initial design. Not returned if \code{lightReturn} is
+    \code{TRUE}.
 
   }
   \item{cStar }{

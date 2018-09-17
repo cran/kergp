@@ -39,16 +39,16 @@ const static double EPSILON = 1e-7;
  * Exponential                                                                *
  *============================================================================*/
 
-SEXP k1Exp(SEXP x1,       /* site #1 (scalar)                                 */
+SEXP k1ExpC(SEXP x1,       /* site #1 (scalar)                                 */
 	   SEXP x2,       /* site #2 (scalar)                                 */
 	   SEXP par) {    /* parameter vector: c(range, var)                  */  
 
   int i1, i2, n1 = LENGTH(x1), n2 = LENGTH(x2);
   SEXP kernValue, dkernValue, attrNm, dd;
   
-  x1 = coerceVector(x1, REALSXP);
-  x2 = coerceVector(x2, REALSXP);
-  par = coerceVector(par, REALSXP);
+  PROTECT(x1 = coerceVector(x1, REALSXP));
+  PROTECT(x2 = coerceVector(x2, REALSXP));
+  PROTECT(par = coerceVector(par, REALSXP));
   
   if (LENGTH(par) != 2) {
     Rprintf("length(par) = %d\n", LENGTH(par)); 
@@ -80,7 +80,7 @@ SEXP k1Exp(SEXP x1,       /* site #1 (scalar)                                 */
   // attribut "gradient" de 'Cov'.
   SET_ATTR(kernValue, attrNm, dkernValue);
   
-  UNPROTECT(4);
+  UNPROTECT(7);
   return(kernValue);
 
 }
@@ -89,16 +89,16 @@ SEXP k1Exp(SEXP x1,       /* site #1 (scalar)                                 */
  * Gauss                                                                      *
  *============================================================================*/
 
-SEXP k1Gauss(SEXP x1,       /* site #1 (scalar)                               */
+SEXP k1GaussC(SEXP x1,       /* site #1 (scalar)                               */
 	     SEXP x2,       /* site #2 (scalar)                               */
 	     SEXP par) {    /* parameter vector: c(range, var)                */  
 
   int i1, i2, n1 = LENGTH(x1), n2 = LENGTH(x2);
   SEXP kernValue, dkernValue, attrNm, dd;
   
-  x1 = coerceVector(x1, REALSXP);
-  x2 = coerceVector(x2, REALSXP);
-  par = coerceVector(par, REALSXP);
+  PROTECT(x1 = coerceVector(x1, REALSXP));
+  PROTECT(x2 = coerceVector(x2, REALSXP));
+  PROTECT(par = coerceVector(par, REALSXP));
 
   if (LENGTH(par) != 2) {
     error("For \"Gauss\" kernel, 'par' must be of length 2");
@@ -131,7 +131,7 @@ SEXP k1Gauss(SEXP x1,       /* site #1 (scalar)                               */
   // attribut "gradient" de 'Cov'.
   SET_ATTR(kernValue, attrNm, dkernValue);
   
-  UNPROTECT(4);
+  UNPROTECT(7);
   return(kernValue);
 
 }
@@ -141,16 +141,16 @@ SEXP k1Gauss(SEXP x1,       /* site #1 (scalar)                               */
  *  Note the check z != 0.0 for the derivative                                *
  *============================================================================*/
 
-SEXP k1PowExp(SEXP x1,       /* site #1 (scalar)                              */
+SEXP k1PowExpC(SEXP x1,       /* site #1 (scalar)                              */
 	      SEXP x2,       /* site #2 (scalar)                              */
 	      SEXP par) {    /* parameter vector: c(range, shape, var)        */  
   
   int i1, i2, n1 = LENGTH(x1), n2 = LENGTH(x2);
   SEXP kernValue, dkernValue, attrNm, dd;
   
-  x1 = coerceVector(x1, REALSXP);
-  x2 = coerceVector(x2, REALSXP);
-  par = coerceVector(par, REALSXP);
+  PROTECT(x1 = coerceVector(x1, REALSXP));
+  PROTECT(x2 = coerceVector(x2, REALSXP));
+  PROTECT(par = coerceVector(par, REALSXP));
 
   if (LENGTH(par) != 3) {
     error("For \"PowExp\" kernel, 'par' must be of length 3");
@@ -188,7 +188,7 @@ SEXP k1PowExp(SEXP x1,       /* site #1 (scalar)                              */
   // attribut "gradient" de 'Cov'.
   SET_ATTR(kernValue, attrNm, dkernValue);
   
-  UNPROTECT(4);
+  UNPROTECT(7);
   return(kernValue);
 
 }
@@ -197,16 +197,16 @@ SEXP k1PowExp(SEXP x1,       /* site #1 (scalar)                              */
  *  Matern nu = 3/2                                                           *
  *============================================================================*/
 
-SEXP k1Matern3_2(SEXP x1,       /* site #1 (scalar)                           */
+SEXP k1Matern3_2C(SEXP x1,       /* site #1 (scalar)                           */
 		 SEXP x2,       /* site #2 (scalar)                           */
 		 SEXP par) {    /* parameter vector: c(range, var)            */  
    
   int i1, i2, n1 = LENGTH(x1), n2 = LENGTH(x2);
   SEXP kernValue, dkernValue, attrNm, dd;
   
-  x1 = coerceVector(x1, REALSXP);
-  x2 = coerceVector(x2, REALSXP);
-  par = coerceVector(par, REALSXP);
+  PROTECT(x1 = coerceVector(x1, REALSXP));
+  PROTECT(x2 = coerceVector(x2, REALSXP));
+  PROTECT(par = coerceVector(par, REALSXP));
   
   if (LENGTH(par) != 2) {
     error("For \"Matern3_2\" kernel, 'par' must be of length 2");
@@ -240,7 +240,7 @@ SEXP k1Matern3_2(SEXP x1,       /* site #1 (scalar)                           */
   // attribut "gradient" de 'Cov'.
   SET_ATTR(kernValue, attrNm, dkernValue);
   
-  UNPROTECT(4);
+  UNPROTECT(7);
   return(kernValue);
 
 
@@ -250,16 +250,16 @@ SEXP k1Matern3_2(SEXP x1,       /* site #1 (scalar)                           */
  *  Matern nu = 5/2                                                           *
  *============================================================================*/
 
-SEXP k1Matern5_2(SEXP x1,       /* site #1 (scalar)                           */
+SEXP k1Matern5_2C(SEXP x1,       /* site #1 (scalar)                           */
 		 SEXP x2,       /* site #2 (scalar)                           */
 		 SEXP par) {    /* parameter vector: c(range,  var)           */
   
   int i1, i2, n1 = LENGTH(x1), n2 = LENGTH(x2);
   SEXP kernValue, dkernValue, attrNm, dd;
   
-  x1 = coerceVector(x1, REALSXP);
-  x2 = coerceVector(x2, REALSXP);
-  par = coerceVector(par, REALSXP);
+  PROTECT(x1 = coerceVector(x1, REALSXP));
+  PROTECT(x2 = coerceVector(x2, REALSXP));
+  PROTECT(par = coerceVector(par, REALSXP));
 
   if (LENGTH(par) != 2) {
     error("For \"Matern5_2\" kernel, 'par' must be of length 2");
@@ -292,7 +292,7 @@ SEXP k1Matern5_2(SEXP x1,       /* site #1 (scalar)                           */
   // attribut "gradient" de 'Cov'.
   SET_ATTR(kernValue, attrNm, dkernValue);
   
-  UNPROTECT(4);
+  UNPROTECT(7);
   return(kernValue);
 
 }

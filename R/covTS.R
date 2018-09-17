@@ -30,10 +30,13 @@ setClass("covTS",
 ##*******
 
 covTS <- function(inputs = paste("x", 1L:d, sep = ""),
-                  d = length(inputs), kernel = "k1matern5_2",
+                  d = length(inputs), kernel = "k1Matern5_2",
                   dep = NULL, value = NULL, var = 1, ...) {
     
-    if (missing(d) & missing(inputs)) stop("at least one of 'd' or 'inputs' must be provided")
+    if (missing(d) & missing(inputs)) {
+        stop("at least one of 'd' or 'inputs' must be provided")
+    }
+    
     if (length(inputs) != d) stop("'d' must be equal to 'length(inputs)'")
     
     inputNames <- inputs
@@ -75,7 +78,7 @@ covTS <- function(inputs = paste("x", 1L:d, sep = ""),
     if (is.na(m) || length(m) != 1L) {
         stop("parNames(kernel) must contain one element \"var\"")
     }
-
+    
     ## remove "var" 
     DKparNames <- DKparNames[-m]
     DKparN <- kernel@parN - 1L
@@ -90,7 +93,8 @@ covTS <- function(inputs = paste("x", 1L:d, sep = ""),
     if (!is.null(dep)) {
         dep <- unlist(dep)
         if ( is.null(names(dep)) || !all(names(dep) %in% DKparNames) ) {
-            stop("'dep' must have names corresponding to the kernel parameters")
+            stop("'dep' must have names corresponding to",
+                 " the kernel parameters")
         }
         depC[names(dep)] <- dep
     } 
@@ -115,7 +119,8 @@ covTS <- function(inputs = paste("x", 1L:d, sep = ""),
         else vali <- NA
         if (depi == 1L) {
             if (length(vali) > 1L)
-                warning("only the first provided value for ", nm , "will be used.") 
+                warning("only the first provided value for ", nm ,
+                        "will be used.") 
             par <- c(par, vali[1])
             parLower <- c(parLower, DKparLower[nm])
             parUpper <- c(parUpper, DKparUpper[nm])
@@ -433,8 +438,12 @@ setMethod("covMat",
               if (isXnew){
                   Xnew <- as.matrix(Xnew)
                   if (checkNames) Xnew <- checkX(object, X = Xnew)
-                  if (ncol(X) != ncol(Xnew)) stop("'X' and 'Xnew' must have the same number of columns")
-                  if (any(is.na(Xnew))) stop("'Xnew' must not contain NA elements") 
+                  if (ncol(X) != ncol(Xnew)) {
+                      stop("'X' and 'Xnew' must have the same number of columns")
+                  }
+                  if (any(is.na(Xnew))) {
+                      stop("'Xnew' must not contain NA elements")
+                  }
               } else {
                   Xnew <- X
               }
@@ -457,12 +466,11 @@ setMethod("covMat",
               environment(kernFun) <- rho
 
               if (!isXnew) {
-                  Cov <- .Call("covMat_covTS", kernFun, t(X), par, parM, compGrad, index, rho,
-                               PACKAGE = "kergp")
+                  Cov <- .Call("covMat_covTS", kernFun, t(X), par, parM, compGrad, index, rho)
               } else { 
                   if (compGrad) stop("Gradient computation not implemented when Xnew!=NULL")
                   Cov <- .Call("covMatMat_covTS", kernFun, t(X), t(Xnew), par, parM, 
-                               compGrad, index, rho, PACKAGE = "kergp")
+                               compGrad, index, rho)
               }    
               return(Cov)
           })
@@ -493,7 +501,43 @@ setMethod("scores",
               
               rho <- new.env()
               environment(kernFun) <- rho
-              scores <- .Call("scores_covTS", kernFun, t(X), par, parM, weights, rho,
-                              PACKAGE = "kergp")
+              scores <- .Call("scores_covTS", kernFun, t(X), par, parM, weights, rho)
               
           })
+
+##***********************************************************************
+## Compute the variance vector, i.e. only the diagonal of covMat.
+##
+##***********************************************************************
+setMethod("varVec",
+          signature = "covTS", 
+          definition = function(object, X,
+              compGrad = FALSE, checkNames = TRUE,
+              index = -1L, ...) {
+              
+              X <- as.matrix(X)
+              if (checkNames) X <- checkX(object, X = X)
+              if (any(is.na(X))) stop("'X' must not contain NA elements")
+              
+              par <- coef(object)
+              npar <- length(par)
+              parM <- t(parMap(object) - 1L)
+              parM[] <- as.integer(parM)
+              
+              if (compGrad && (index < 1L || index > npar)) {
+                  stop("when 'compGrad' is TRUE, 'index' must",
+                       " be between 1 and npar(object)")
+              }
+              compGrad <- as.integer(compGrad)
+              index <- as.integer(index) - 1L
+
+              kernFun <- object@kernel@kernel
+              
+              rho <- new.env()
+              environment(kernFun) <- rho
+              
+              Var <- .Call("varVec_covTS", kernFun, t(X), par, parM, compGrad, index, rho)
+              
+              return(Var)
+          })
+

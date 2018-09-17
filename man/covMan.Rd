@@ -1,7 +1,7 @@
 \name{covMan}
 \alias{covMan}
 
-\title{ Creator function for covMan objects }
+\title{ Creator Function for \code{covMan} Objects }
  
 \description{
   
@@ -13,7 +13,8 @@
 \usage{
    covMan(kernel, hasGrad = FALSE, acceptMatrix = FALSE,
           inputs = paste("x", 1:d, sep = ""), 
-          d = length(inputs), parNames, par = NULL, 
+          d = length(inputs), parNames,
+          par = NULL, parLower = NULL, parUpper = NULL,
           label = "covMan", ...) 
 } 
 
@@ -60,9 +61,10 @@
     Vector of character strings containing the parameter names.
 
   }
-  \item{par}{
+  \item{par, parLower, parUpper}{
 
-    Optional numeric vector containing the parameter values.
+    Optional numeric vectors containing the parameter values, lower
+    bounds and upper bounds.
 
   }
   \item{label}{
@@ -193,15 +195,15 @@ myCovMan
 ## A kernel admitting matricial arguments
 myCov <- covMan(
     
-    kernel = function(X1, X2, par) { 
-      # X1 : matrix of size n1xd
-      # X2 : matrix of size n2xd
+    kernel = function(x1, x2, par) { 
+      # x1 : matrix of size n1xd
+      # x2 : matrix of size n2xd
             
-      d <- ncol(X1)
+      d <- ncol(x1)
             
       SS2 <- 0
       for (j in 1:d){
-        Aj <- outer(X1[, j], X2[, j], "-")
+        Aj <- outer(x1[, j], x2[, j], "-")
         Aj2 <- Aj^2
         SS2 <- SS2 + Aj2 / par[j]^2
       }

@@ -1,8 +1,3 @@
-library(testthat)
-library(kergp)
-library(numDeriv)
-
-
 ## require (numDeriv)  now in 'Depends'
 precision <- 1e-6
 
@@ -21,7 +16,7 @@ covAsVec <- function(par, object, index, ...) {
 }
 
 ## define a covTS
-myCov <- covTS(d = d, kernel = "k1powExp",
+myCov <- covTS(d = d, kernel = "k1PowExp",
                dep = c(range = "input", shape = "input"),
                value = c(range = 0.1, shape = 0.6))
 

@@ -32,12 +32,17 @@ if (!isGeneric("kernelName")) {
 }
 
 ##=======================================================================
-## Extract the names of the inputs. The are usesd for 'official'
+## Extract or set the names of the inputs. The are usesd for 'official'
 ## validations in kergp.
 ##=======================================================================
 if (!isGeneric("inputNames")) {
   setGeneric("inputNames",
              function(object, ...) standardGeneric("inputNames")
+             )
+}
+if (!isGeneric("inputNames<-")) {
+  setGeneric("inputNames<-",
+             function(object, ..., value) standardGeneric("inputNames<-")
              )
 }
 
@@ -81,10 +86,17 @@ setGeneric("compCoefUpper",
            )
 
 ##=======================================================================
-## The same as covMatrix, but with more arguements
+## Covariance matrix
 ##=======================================================================
 setGeneric("covMat",
            function(object, X, Xnew = NULL, ...) standardGeneric("covMat")
+           )
+
+##=======================================================================
+## Variance vector
+##=======================================================================
+setGeneric("varVec",
+           function(object, X, ...) standardGeneric("varVec")
            )
 
 ##=======================================================================

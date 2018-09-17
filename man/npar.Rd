@@ -2,7 +2,7 @@
 \alias{npar}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  Generic function returning the number of free parameters in a covariance kernel
+  Generic function: Number of Free Parameters in a Covariance Kernel
 }
 \description{
   

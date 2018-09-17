@@ -39,7 +39,8 @@
 # }
 
 gp <- function(formula, data,
-               inputs, cov,
+               inputs = inputNames(cov),
+               cov,
                estim = TRUE,
                ...) {
     
@@ -50,8 +51,11 @@ gp <- function(formula, data,
     if (as.character(formula[[2]]) %in% inputs) {
         stop("the response can not appear in 'inputs'")
     }
-    
-    X <- as.matrix(data[ , inputs, drop = FALSE], rownames.force = TRUE)
+
+    ## remove coercion to allow qualitative kernels.
+    ## X <- as.matrix(data[ , inputs, drop = FALSE], rownames.force = TRUE)
+    X <- data[ , inputs, drop = FALSE]
+                   
     mf <- model.frame(formula, data = data)
     tt <- terms(mf)
     y <- model.response(mf, "numeric")
@@ -59,7 +63,7 @@ gp <- function(formula, data,
     n <- length(y)
     p <- ncol(F)
     d <- ncol(X)
-
+    
     if (estim) {
         if (is(cov, "covMan")) {
             ## this is the default value in mle, hence...
@@ -73,23 +77,28 @@ gp <- function(formula, data,
         }
         
         fit <- try(mle(object = cov,
-              y = y, X = X, F = F,
-              ...))
+                       y = y, X = X, F = F,
+                       ...))
 
         if (inherits(fit, "try-error")) stop("Maximum Likelihood error")
         optValue <- fit$opt$val
         ## replace 'cov'.
         cov <- fit$cov
         ## varNoise <- fit$varNoise
+        MLE <- fit
         fit <- fit$trendRes
+        logLik <- MLE$logLik
         
     } else {
+            
         ## if (is.na(varNoise)) varNoise <- NULL
         fit <- try(gls(object = cov,
                        y = y, X = X, F = F,
                        ...))
-        if (inherits(fit, "try-error")) stop("Maximum Likelihood error")
+        if (inherits(fit, "try-error")) stop("GLS error")
         optValue <- NULL
+        MLE <- NULL
+        logLik <- NA
     }
     
     ##   if (is.null(coefTrend)) {
@@ -110,7 +119,10 @@ gp <- function(formula, data,
                 covariance = cov,
                 noise = fit$noise,
                 varNoise = fit$varNoise,
-                optValue = optValue)
+                trendKnown = fit$trendKnown,
+                optValue = optValue,
+                MLE = MLE,
+                logLik = logLik)
     
     class(res) <- "gp"
     return(res)
@@ -128,7 +140,8 @@ gp <- function(formula, data,
 ## possibly having some attributes.
 ##
 ##============================================================================
-predict.gp <- function(object, newdata, type, 
+predict.gp <- function(object, newdata,
+                       type = ifelse(object$trendKnown, "SK", "UK"), 
                        seCompute = TRUE, covCompute = FALSE,
                        lightReturn = FALSE, biasCorrect = FALSE,
                        forceInterp = FALSE,
@@ -168,7 +181,7 @@ predict.gp <- function(object, newdata, type,
                   as.double(XNewMat), as.integer(n2), 
                   as.integer(ncol(XMat)),
                   as.double(object$varNoise),
-                  ans = double(n1 * n2), PACKAGE = "kergp")
+                  ans = double(n1 * n2))
         cWN <- matrix(out$ans, n1, n2)
         cNew <- cNew + cWN
     }
@@ -187,17 +200,30 @@ predict.gp <- function(object, newdata, type,
     }
     
     if (seCompute) {
-        m <- nrow(XNew)
-        sd2Total <- rep(NA, m)
-        for (i in 1:m){   ## MMM prevoir de l'ecrire en C pour covMan
-            sd2Total[i] <- covMat(object = object$covariance, 
-                                  X = XNew[i, , drop = FALSE], checkNames = FALSE)
+        ## changed by Yves 2017-04-24
+        if (FALSE) {
+            m <- nrow(XNew)
+            sd2Total <- rep(NA, m)
+            for (i in 1:m){   ## MMM prevoir de l'ecrire en C pour covMan
+                sd2Total[i] <- covMat(object = object$covariance, 
+                                      X = XNew[i, , drop = FALSE],
+                                      checkNames = FALSE)
+            }
+        } else {
+            sd2Total <- varVec(object = object$covariance, X = XNew,
+                               checkNames = FALSE,
+                               compGrad = FALSE)
         }
+        ## end changed by Yves 2017-04-24
+        
         if (forceInterp){
             sd2Total <- sd2Total + object$varNoise
         }
         
-        s2Predict1 <- apply(cNewStar, 2, crossprod)
+        
+        ## Change to improve perfomance (thanks to Clement Walter)
+        ## s2Predict1 <- apply(cNewStar, 2, crossprod)
+        s2Predict1 <- as.vector(rep(1, nrow(cNewStar)) %*% (cNewStar^2))
         s2SK <- pmax(sd2Total - s2Predict1, 0)
         
         ## compute c(x)'*C^(-1)*c(x) for x = newdata
@@ -207,7 +233,10 @@ predict.gp <- function(object, newdata, type,
         } else if (type == "UK") {
             FNewError <-  FNew - t(cNewStar) %*% object$FStar
             FNewError <- forwardsolve(t(object$RStar), t(FNewError))
-            s2Predict2 <- apply(FNewError, 2, crossprod)
+            
+            ## Change to imporve perfomance (thanks to Clement Walter)
+            ## s2Predict2 <- apply(FNewError, 2, crossprod)
+            s2Predict2 <- as.vector(rep(1, nrow(FNewError)) %*% (FNewError^2))
             s2Predict <- s2SK + s2Predict2
             n <- object$dim$n
             if (biasCorrect) {
@@ -228,13 +257,13 @@ predict.gp <- function(object, newdata, type,
     
     ## covariance matrix of prediction errors
     if (covCompute) {
-        CNew <- covMat(object$covariance, X = XNew, checkNames = FALSE)     ## MMM method here
-        covCond <- CNew - crossprod(cNewStar, cNewStar)
+        CNew <- covMat(object$covariance, X = XNew, checkNames = FALSE) 
+        covCond <- CNew - crossprod(cNewStar)
         ## if (p > 0L) {
         if (type == "UK"){
             FNewError <-  FNew - t(cNewStar) %*% object$FStar
             FNewError <- forwardsolve(t(object$RStar), t(FNewError))
-            covCond <- covCond + crossprod(FNewError, FNewError)
+            covCond <- covCond + crossprod(FNewError)
             if (biasCorrect){
                 n <- object$dim$n
                 covCond <- covCond * n / (n - p)
@@ -296,7 +325,7 @@ influence.gp <- function(model, type = "UK", trend.reestim = TRUE, ...) {
                 beta <- as.matrix(l$coef, ncol = 1)
             }
             z <- x - M%*%beta
-            Tinv.c <- forwardsolve(L.but.i, c.but.i)      # only a vector in this case
+            Tinv.c <- forwardsolve(L.but.i, c.but.i) ## only a vector here
             y.predict.complement <- t(Tinv.c) %*% z
             y.predict.trend <- F.i %*% beta
             
@@ -322,13 +351,13 @@ influence.gp <- function(model, type = "UK", trend.reestim = TRUE, ...) {
         
     } else {
         ## fast computation
-        Cinv <- chol2inv(t(L))                       ## cost : n*n*n/3
+        Cinv <- chol2inv(t(L))                      ## cost : n*n*n/3
         if (trend.reestim && (type == "UK")) {
-            M <- model$FStar    ##FStar = inv(L)*F      cost : n*n*p     to recompute
-            Cinv.F <- Cinv %*% F                     ## cost : 2*n*n*p
-            T.M <- chol(crossprod(M))                ## cost : p*p*p/3,  neglected
-            aux <- forwardsolve(t(T.M), t(Cinv.F))   ## cost : p*p*n,    neglected
-            Q <- Cinv - crossprod(aux)               ## cost : 2*n*n*(p-1/2)
+            M <- model$FStar    ##FStar = inv(L)*F  cost : n*n*p     to recompute
+            Cinv.F <- Cinv %*% F                    ## cost : 2*n*n*p
+            T.M <- chol(crossprod(M))               ## cost : p*p*p/3,  neglected
+            aux <- forwardsolve(t(T.M), t(Cinv.F))  ## cost : p*p*n,    neglected
+            Q <- Cinv - crossprod(aux)              ## cost : 2*n*n*(p-1/2)
             Q.y <- Q%*%y
             ## Remark:   Q <- Cinv - Cinv.F %*% solve(t(M)%*%M) %*% t(Cinv.F)
             ## direct (not so bad actually)
@@ -353,7 +382,10 @@ influence.gp <- function(model, type = "UK", trend.reestim = TRUE, ...) {
 ## Plot method (similar to DiceKriging::km) 
 ##=========================================
 
-plot.gp <- function(x, y, kriging.type = "UK", trend.reestim = TRUE, which = 1:3, ...) {
+plot.gp <- function(x, y,
+                    kriging.type = "UK",
+                    trend.reestim = TRUE,
+                    which = 1:3, ...) {
     
     model <- x
     pred <- influence(model, type=kriging.type, trend.reestim=trend.reestim)
@@ -408,8 +440,10 @@ summary.gp <- function (object, ...) {
 }
 
 print.summary.gp <-
-    function(x, digits = max(3L, getOption("digits") - 3L),
-             signif.stars = getOption("show.signif.stars"), ...) {
+    function(x,
+             digits = max(3L, getOption("digits") - 3L),
+             signif.stars = getOption("show.signif.stars"),
+             ...) {
         
         class(x) <- "gp"
         
@@ -441,16 +475,19 @@ print.summary.gp <-
     }
 
 
-coef.gp <- function(object, type = c("all", "trend", "covariance", "varNoise"), ...){
+coef.gp <- function(object,
+                    type = c("all", "trend", "covariance", "varNoise"),
+                    ...) {
     type <- match.arg(type)
     switch(type,
            trend = object$betaHat,
            covariance = coef(object$covariance),
            varNoise = c(varNoise = object$varNoise),
-           all = c(object$betaHat, coef(object$covariance), varNoise = object$varNoise))
+           all = c(object$betaHat, coef(object$covariance),
+               varNoise = object$varNoise))
 }
 
-print.gp <- function(x, ...){
+print.gp <- function(x, ...) {
     print(x$call)
     cat("\nNumber of observations:", x$dim$n, "\n")
     cat("\nTrend coef.:\n")

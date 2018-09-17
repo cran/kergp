@@ -3,8 +3,8 @@
 
 \title{
 
-  Generic function returning a covariance or a cross-covariance
-  matrix between two sets of locations
+  Generic Function: Covariance or Cross-Covariance
+  Matrix Between two Sets of Locations
 
 }
 \description{

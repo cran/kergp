@@ -102,8 +102,10 @@
     %      check the compatibility of a \code{covTS} object and a design matrix. }
     \item{coef}{
       
-      \code{signature(object = "covTS")}: extracts the numeric values of the covariance parameters. 
-      %an ersatz of the \code{covMatrix} method, with slightly different parameters and use.
+      \code{signature(object = "covTS")}: extracts the numeric values of
+      the covariance parameters.
+      %an ersatz of the \code{covMatrix} method, with slightly different
+      %parameters and use.
 
     }
     \item{coef<-}{
@@ -165,7 +167,8 @@
     }
     \item{simulPar}{
 
-      \code{signature(object = "covTS")}: simulates random values for the covariance parameters.
+      \code{signature(object = "covTS")}: simulates random values for
+      the covariance parameters.
 
     }
   }

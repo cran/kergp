@@ -7,7 +7,8 @@
 
 \title{
   
-  Extract coefficients of a covTS object as vector, list or matrix
+  Extract Coefficients of a Covariance Kernel Object as Vector, List or
+  Matrix
 
 }
 
@@ -62,7 +63,7 @@
 }
 \examples{
 d <- 3
-myCov1 <- covTS(d = d, kernel = "k1exp", dep = c(range = "input"),
+myCov1 <- covTS(d = d, kernel = "k1Exp", dep = c(range = "input"),
                 value = c(range = 1.1))
 myCov1
 ## versatile 'coef' method

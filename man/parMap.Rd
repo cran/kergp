@@ -3,8 +3,8 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 
-  Generic function to map the parameters of a composite covariance
-  kernel
+  Generic Function: Map the Parameters of a Composite Covariance
+  Kernel
 
 }
 \description{

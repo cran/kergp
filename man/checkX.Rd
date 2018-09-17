@@ -5,8 +5,8 @@
 
 \title{
   
-  Generic function to check the compatibility of a design matrix with a given
-  covariance object
+  Generic function: Check the Compatibility of a Design Matrix with a
+  Given Covariance Object
 
 }
 \description{

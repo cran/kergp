@@ -17,11 +17,11 @@
  *============================================================================*/
 
 SEXP covMat_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
-		    SEXP Xt,       // Transpose of the spatial design matrix
-		    SEXP par,      // Vector of (real) parameters' values
-		    SEXP compGrad, // Integer 0 or 1: compute gradient matrix?
-		    SEXP index,    // Index for grad. INTEGER 0 <= < length(par) 
-		    SEXP rho) {    // An R environment
+		   SEXP Xt,       // Transpose of the spatial design matrix
+		   SEXP par,      // Vector of (real) parameters' values
+		   SEXP compGrad, // Integer 0 or 1: compute gradient matrix?
+		   SEXP index,    // Index for grad. INTEGER 0 <= < length(par) 
+		   SEXP rho) {    // An R environment
   
   int  i, j, k, n, d;   //*icompGrad;
   double *rxt = REAL(Xt), *rx1, *rx2, *rCov, *rpar;
@@ -29,11 +29,11 @@ SEXP covMat_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
   
   if (!isFunction(fun)) error("'fun' must be a function");
   if (!isMatrix(Xt)) error("'Xt' must be a matrix");
-  if(!isEnvironment(rho)) error("'rho' should be an environment");
+  if (!isEnvironment(rho)) error("'rho' should be an environment");
 
   /* find the number of rows and cols in 'X'  */
   SEXP dimXt;
-  Xt = coerceVector(Xt, REALSXP);
+  PROTECT(Xt = coerceVector(Xt, REALSXP));
   dimXt = getAttrib(Xt, R_DimSymbol);
   d = INTEGER(dimXt)[0];
   n = INTEGER(dimXt)[1];
@@ -124,7 +124,7 @@ SEXP covMat_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
     // attribut "gradient" de 'Cov'.
     SET_ATTR(Cov, attrNm, dCov);
 
-    UNPROTECT(8);
+    UNPROTECT(9);
     return(Cov);
 
   } else {
@@ -152,7 +152,7 @@ SEXP covMat_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
       
     }
     
-    UNPROTECT(4);
+    UNPROTECT(5);
     return(Cov);
     
   }
@@ -185,15 +185,15 @@ SEXP covMatMat_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   if (!isFunction(fun)) error("'fun' must be a function");
   if (!isMatrix(X1t)) error("'X1t' must be a matrix"); 
   if (!isMatrix(X2t)) error("'X2t' must be a matrix");
-  if(!isEnvironment(rho)) error("'rho' should be an environment");
+  if (!isEnvironment(rho)) error("'rho' should be an environment");
   
   /* find the number of rows and cols in 'X'  */
-  X1t = coerceVector(X1t, REALSXP);
+  PROTECT(X1t = coerceVector(X1t, REALSXP));
   PROTECT(dimX1t = getAttrib(X1t, R_DimSymbol));
   d = INTEGER(dimX1t)[0];
   n1 = INTEGER(dimX1t)[1];
  
-  X2t = coerceVector(X2t, REALSXP);
+  PROTECT(X2t = coerceVector(X2t, REALSXP));
   PROTECT(dimX2t = getAttrib(X2t, R_DimSymbol));
   if (INTEGER(dimX2t)[0] != d) {
     error("'X1t' and 'X2t must have the same number of rows (number of inputs)");
@@ -217,11 +217,11 @@ SEXP covMatMat_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   
   /* check the parameters arrays  */
   npar = LENGTH(par);
-  par = coerceVector(par, REALSXP);
+  par = PROTECT(coerceVector(par, REALSXP));
   
   if ( INTEGER(compGrad)[0] ) {
     
-    UNPROTECT(6);
+    UNPROTECT(9);
     error("Gradient computation not implemented for covMatMat");
     
   } else {
@@ -251,9 +251,116 @@ SEXP covMatMat_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
       }
     }
 
-    UNPROTECT(7);
+    UNPROTECT(10);
     return(Cov);
 
+  }
+
+}
+
+/*============================================================================*
+ * Author: Yves                                                               *
+ *                                                                            *
+ * Compute only the variances for prediction.                                 * 
+ * In this version, the argument 'par' can be used and passed to the kernel   *
+ * function from the C-level. Moreover, the gradient of the vector with       *
+ * respect to ONE of the parameters can be computed if wanted, and then       *
+ * returned as the "gradient" attribute of the covariance. Note that          *
+ * "gradient" is  NOT the full gradient (which is an huge array) but only one *
+ * element of it.                                                             *
+ *                                                                            *
+ *============================================================================*/
+
+SEXP varVec_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
+		   SEXP Xt,       // Transpose of the spatial design matrix
+		   SEXP par,      // Vector of (real) parameters' values
+		   SEXP compGrad, // Integer 0 or 1: compute gradient vector?
+		   SEXP index,    // Index for grad. INTEGER 0 <= < length(par) 
+		   SEXP rho) {    // An R environment
+  
+  int  i, k, n, d;   //*icompGrad;
+  double *rxt = REAL(Xt), *rx1, *rVar, *rpar;
+  SEXP R_fcall, Var, x1;
+  
+  if (!isFunction(fun)) error("'fun' must be a function");
+  if (!isMatrix(Xt)) error("'Xt' must be a matrix");
+  if (!isEnvironment(rho)) error("'rho' should be an environment");
+
+  /* find the number of rows and cols in 'X'  */
+  SEXP dimXt;
+  PROTECT(Xt = coerceVector(Xt, REALSXP));
+  dimXt = getAttrib(Xt, R_DimSymbol);
+  d = INTEGER(dimXt)[0];
+  n = INTEGER(dimXt)[1];
+  //icompGrad[0] = INTEGER(compGrad)[0];
+
+  PROTECT(Var = allocVector(REALSXP, n));   
+  PROTECT(x1 = allocVector(REALSXP, d));
+
+  rVar = REAL(Var);
+  rx1 = REAL(x1);
+  rpar = REAL(par);
+
+  PROTECT(R_fcall = lang4(fun, x1, x1, par));
+  SETCADDDR(R_fcall, par);
+  // SETCAD4R(R_fcall, compGrad);
+  
+  if ( INTEGER(compGrad)[0] ) {
+
+    SEXP dVar, kernValue, dkernValue, attrNm;
+    double *rdVar;
+    int iindex, npar;
+
+    npar = LENGTH(par);
+
+    iindex = INTEGER(index)[0];
+  
+    PROTECT(dVar = allocMatrix(REALSXP, n, 1)); 
+    PROTECT(kernValue = allocVector(REALSXP, 1));
+    PROTECT(dkernValue = allocVector(REALSXP, npar));
+    
+    PROTECT(attrNm = NEW_CHARACTER(1));
+    SET_STRING_ELT(attrNm, 0, mkChar("gradient"));
+    rdVar = REAL(dVar);
+
+    for (i = 0; i < n; i++) {
+      
+      for (k = 0; k < d; k++) {
+	rx1[k] = rxt[i*d + k];
+      }
+      
+      SETCADR(R_fcall, x1);
+      SETCADDR(R_fcall, x1);
+      kernValue = eval(R_fcall, rho);
+      rVar[i] = REAL(kernValue)[0]; 
+      dkernValue = GET_ATTR(kernValue, attrNm);
+      rdVar[i] = REAL(dkernValue)[iindex]; 
+      
+    }
+    
+    // attribut "gradient" de 'VAr'.
+    SET_ATTR(Var, attrNm, dVar);
+
+    UNPROTECT(8);
+    return(Var);
+
+  } else {
+   
+    for (i = 0; i < n; i++) {
+      
+      for (k = 0; k < d; k++) {
+	rx1[k] = rxt[i*d + k];
+      }
+      
+      SETCADR(R_fcall, x1);
+      SETCADDR(R_fcall, x1);
+      rVar[i] = REAL(eval(R_fcall, rho))[0];
+      
+    }
+    
+    UNPROTECT(4);
+    return(Var);
+    
   }
 
 }

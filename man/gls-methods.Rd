@@ -3,7 +3,7 @@
 \alias{gls,covAll-method}
 \alias{gls-methods}
 \title{
-  Generalized Least Squares estimation with a given covariance kernel
+  Generalized Least Squares Estimation with a Given Covariance Kernel
 }
 
 \description{
@@ -158,7 +158,7 @@
 \examples{
 ## a possible 'covTS'
 myCov <- covTS(inputs = c("Temp", "Humid"),
-               kernel = "k1matern5_2",
+               kernel = "k1Matern5_2",
                dep = c(range = "input"),
                value = c(range = 0.4))
 d <- myCov@d; n <- 100;
