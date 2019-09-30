@@ -22,7 +22,7 @@
     parCovUpper = coefUpper(object),
     noise = TRUE, varNoiseIni = var(y) / 10,
     varNoiseLower = 0, varNoiseUpper = Inf,
-    compGrad = TRUE,
+    compGrad = hasGrad(object),
     doOptim = TRUE,
     optimFun = c("nloptr::nloptr", "stats::optim"),
     optimMethod = ifelse(compGrad, "NLOPT_LD_LBFGS", "NLOPT_LN_COBYLA"),

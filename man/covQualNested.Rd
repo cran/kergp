@@ -4,6 +4,7 @@
 \usage{
 
 covQualNested(input = "x",
+              groupList = NULL,
               group = NULL,
               nestedLevels = NULL,
               between = "Symm",
@@ -11,7 +12,8 @@ covQualNested(input = "x",
               covBet = c("corr", "homo", "hete"), 
               covWith = c("corr", "homo", "hete"),
               compGrad = TRUE,
-              contrasts = contr.helmod)
+              contrasts = contr.helmod,
+              intAsChar = TRUE)
 
 }
 \arguments{
@@ -23,13 +25,25 @@ covQualNested(input = "x",
     \code{\link{covMat,covQual-method}} method.
     
   }
+  \item{groupList}{
+
+    A list giving the groups, see \bold{Examples}. Groups of
+    size 1 are accepted. Note that the group values should be given in
+    some order, with no gap between repeated values, see \bold{Examples}.
+  }
+
   \item{group}{
 
-    A factor of vector giving the groups, see \bold{Examples}.
+    Inactive if \code{groupList} is used. 
+    A factor or vector giving the groups, see \bold{Examples}. Groups of
+    size 1 are accepted. Note that the group values should be given in
+    some order, with no gap between repeated values, see
+    \bold{Examples}.
 
   }
   \item{nestedLevels}{
     
+    Inactive if \code{groupList} is used. 
     A factor or a vector giving the (nested) levels within the group for
     each level of \code{group}. If this is missing, each element of
     \code{group} is assumed to correspond to one nested level within the
@@ -40,11 +54,13 @@ covQualNested(input = "x",
   \item{between}{
     
     Character giving the type of structure to use for the \emph{between}
-    part. For now this can be one of the three choices \code{"Diag"}, 
+    part. For now this can be one of the three choices \code{"Diag"},
     the diagonal structure of \code{\link{q1Diag}}, \code{"Symm"} for
     the general covariance of \code{\link{q1Symm}}, or \code{"CompSymm"}
     for the Compound Symmetry covariance of \code{\link{q1CompSymm}}.
-    Default is \code{Symm}, corresponding to a specific correlation value for each pair of        groups. On the other hand, \code{Diag} corresponds to a common correlation value for all pairs of groups.
+    Default is \code{Symm}, corresponding to a specific correlation
+    value for each pair of groups. On the other hand, \code{Diag}
+    corresponds to a common correlation value for all pairs of groups.
 
   }
   \item{within}{
@@ -77,7 +93,7 @@ covQualNested(input = "x",
   \item{contrasts}{
     
     Object of class \code{"function"}. This function is similar to the
-    \code{\link[stats]{contr.treatment}} or
+    \code{\link[stats]{contr.helmert}} or
     \code{\link[stats]{contr.treatment}} functions, but it must return
     an \emph{orthogonal} matrix. For a given integer \code{n}, it
     returns a matrix with \code{n} rows and \code{n - 1} columns forming
@@ -85,6 +101,12 @@ covQualNested(input = "x",
     \eqn{n}-dimensional Euclidean space. The \code{\link{contr.helmod}}
     can be used to obtain an orthogonal matrix hence defining an
     orthonormal basis.
+
+  } \item{intAsChar}{
+
+    Logical. If \code{TRUE} (default), an integer-valued input will be
+    coerced into a character. Otherwise, it will be coerced into a
+    factor.
 
   }
 
@@ -129,45 +151,48 @@ covQualNested(input = "x",
 ### Ex 2. Below an example in data analysis.
 
 country <- c("B", "B", "B", "F", "F" ,"F", "D", "D", "D")
-cities <- c("AntWerp", "Ghent" , "Charleroi", "Paris", "Marseille", "Lyon",
-            "Berlin", "Hambourg", "Munchen")
+cities <- c("AntWerp", "Ghent" , "Charleroi", "Paris", "Marseille",
+            "Lyon", "Berlin", "Hamburg", "Munchen")
+myGroupList <- list(B = cities[1:3],
+                    F = cities[4:6],
+                    D = cities[7:9])
 
-## create a nested covariance. Note that it will be used with ONE factor
-## input obtained by pasing the group and subgroup.
+## create a nested covariance. 
+# first way, with argument 'groupList':
 
-nest <- covQualNested(input = "ccities",
-                      group = country, nestedLevels = cities,
-                      between = "Symm", within = "Diag",
-                      compGrad = TRUE,
-                      covBet = "corr", covWith = "corr")
+nest1 <- covQualNested(input = "ccities",
+                       groupList = myGroupList,
+                       between = "Symm", within = "Diag",
+                       compGrad = TRUE,
+                       covBet = "corr", covWith = "corr")
 
-## 'show' method as automatically invocated
-nest
+# second way, with arguments 'group' and 'nestedLevels'
+nest2 <- covQualNested(input = "ccities",
+                       group = country, nestedLevels = cities,
+                       between = "Symm", within = "Diag",
+                       compGrad = TRUE,
+                       covBet = "corr", covWith = "corr")
 
-## 'covMat' method: if provided, 'X' must be  a data frame with a
-## suitable factor or integer column. The input name was given
-## at the creation of the covariance structure
 
-Z <- sample(levels(nest)[[1]], size = 30, replace = TRUE)
-df <- data.frame(ccities = factor(Z))
-covMat(nest, X = df)
-covMat(nest)
-\dontrun{
-    if (require(corrplot)) corrplot(cov2cor(covMat(nest)))
-}
+## 'show' and 'plot' method as automatically invocated
+nest2
+plot(nest2, type = "cor")
 
-## 'simulate' method. One can give a 'X' formal, but with no
-## duplicated values!
+## check that the covariance matrices match for nest1 and nest2
+max(abs(covMat(nest1) - covMat(nest2)))
 
-Sim <- simulate(nest, nsim = 30)
-levs <- levels(nest)[[1]]
-matplot(Sim, type = "l", main = "Simulated paths", xaxt = "n")
-axis(side = 1, at = seq_along(levs), labels = levs)
 
-## another 'covMat'
+## When the groups are not given in order, an error occurs!
 
-cc <- as.factor(sample(paste(country, cities, sep = "/"),
-                size = 100, replace = TRUE))
-covMat(nest, X = data.frame(ccities = cc))
+countryBad <- c("B", "B", "F", "F", "F", "D", "D", "D", "B")
+cities <- c("AntWerp", "Ghent", "Paris", "Marseille", "Lyon",
+            "Berlin", "Hamburg", "Munchen", "Charleroi")
+
+nestBad <- try(covQualNested(input = "ccities",
+                             group = countryBad, nestedLevels = cities,
+                             between = "Symm", within = "Diag",
+                             compGrad = TRUE,
+                             covBet = "corr", covWith = "corr"))
+
 
 }

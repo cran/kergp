@@ -253,7 +253,7 @@ corLevCompSymm <- function(par,
             rownames(corMat) <- colnames(corMat) <- levels
             return(corMat)
         } else {
-            corMat <- .Call("corLev_CompSymm",
+            corMat <- .Call(corLev_CompSymm,
                             as.double(rho),
                             as.integer(nlevels), 
                             as.integer(lowerSQRT),
@@ -333,7 +333,8 @@ corLevCompSymm <- function(par,
 ##' max(abs(C1 - C2))
 q1CompSymm <- function(factor,
                        input = "x",
-                       cov = c("corr", "homo")) {
+                       cov = c("corr", "homo"),
+                       intAsChar = TRUE) {
 
     cov <- match.arg(cov)
     cov <- match(cov, c("corr", "homo")) - 1L
@@ -390,6 +391,8 @@ q1CompSymm <- function(factor,
         parUpper = parUpper,
         par = par,
         parN = parN,
-        kernParNames = kernParNames)
+        kernParNames = kernParNames,
+        ordered = FALSE,
+        intAsChar = intAsChar)
     
 }

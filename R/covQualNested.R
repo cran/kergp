@@ -141,6 +141,7 @@ setClass("covQualNested",
 ##' covMat(nest, X = data.frame(ccities = cc))
 ##' 
 covQualNested <- function(input = "x",
+                          groupList = NULL,
                           group = NULL,
                           nestedLevels = NULL,
                           between = "Symm",
@@ -148,7 +149,14 @@ covQualNested <- function(input = "x",
                           covBet = c("corr", "homo", "hete"),
                           covWith = c("corr", "homo", "hete"),
                           compGrad = TRUE,
-                          contrasts = contr.helmod) {
+                          contrasts = contr.helmod,
+                          intAsChar = TRUE) {
+
+    ## if (intAsChar) {
+    ##     warning("With this object, an input of class \"integer\" will be coerced ",
+    ##             "into \"character\", not into \"factor\". Use `intAsChar = FALSE` ",
+    ##             " to change this behaviour")
+    ## }
     
     covBet <- match.arg(covBet)
     covWith <- match.arg(covWith, several.ok = TRUE)
@@ -159,33 +167,65 @@ covQualNested <- function(input = "x",
     
     between <- match.arg(between, choices = c("Diag", "CompSymm", "Symm"))
     within <- match.arg(within, choices = c("Diag", "CompSymm", "Symm"), several.ok = TRUE)
-    
-    contrasts <- match.fun(contrasts)
-    group <- as.factor(group)
-    igroup <- as.integer(group)
- 
-    mVec <- as.vector(table(group))
-    if (any(mVec <= 1)) stop("'group' has levels less than two elements") 
-    m <- sum(mVec)
-    G <- nlevels(group)
 
-    if (!is.null(nestedLevels)) {
-        if (length(nestedLevels) != length(group)) {
-            stop("when 'nestedLevels' is provided it must have the ",
-                 "same length as 'group'")
-        }
-        allLev <- paste(format(group), format(nestedLevels), sep = "/")
-        if (any(duplicated(allLev))) {
-            stop("Comibnations of 'group' and 'nestedLevels' must not",
-                 "be duplicated")
-        }
-                       
-    } else {
-        nestedLevels <-  unlist(tapply(group, group, function(x) 1:length(x)))
+    ## check that 'group' is given in some order (with repeted
+    ## values).  Without this condition the gradient would be wrong.
+    cGroup <- as.character(group)
+    uGroup <- unique(cGroup)
+    m <-  match(cGroup, uGroup)
+    d <- diff(m)
+    if (any(d < 0) || any(d > 1)) {
+        stop("'group' must contain repeated values given in order")
     }
     
-    nestedLevels <- paste(format(group), nestedLevels, sep = "/")
+    contrasts <- match.fun(contrasts)
 
+    if (!missing(group)) {
+    
+        group <- factor(group, levels = unique(group))
+        igroup <- as.integer(group)
+        
+        mVec <- as.vector(table(group))
+        
+        m <- sum(mVec)
+        G <- nlevels(group)
+        
+        if (!is.null(nestedLevels)) {
+            if (length(nestedLevels) != length(group)) {
+                stop("when 'nestedLevels' is provided it must have the ",
+                     "same length as 'group'")
+            }
+            allLev <- paste(as.character(group),
+                            as.character(nestedLevels), sep = "/")
+            if (any(duplicated(allLev))) {
+                stop("Comibnations of 'group' and 'nestedLevels' must not",
+                     "be duplicated")
+            }
+            
+        } else {
+            nestedLevels <-  unlist(tapply(group, group, function(x) 1:length(x)))
+        }
+        
+        nestedLevels <- paste(as.character(group), nestedLevels, sep = "/")
+
+    } else {
+        
+        if (missing(groupList)) {
+            stop("One of the two formals 'group' and 'groupList' must be given")
+        }
+
+        pgl <-  parseGroupList(groupList)
+        group <- factor(pgl$group, levels = unique(pgl$group))
+        igroup <- as.integer(group)
+        mVec <- as.vector(table(group))
+        
+        m <- sum(mVec)
+        G <- nlevels(group)
+
+        nestedLevels <- pgl$levels
+    }
+
+    
     within <- rep(within, length.out = G)
     covWith <- rep(covWith, length.out = G)
 
@@ -211,7 +251,7 @@ covQualNested <- function(input = "x",
         parNames <- c(parNames, paste("bet", betweenC@kernParNames, sep = "_"))
     }
     parN <- c(parN, betweenC@parN)
-
+    
     ## ========================================================================
     ## create the "between" covariance structure
     ## Mind the possibility that a covariance structure has zero parameters!!!
@@ -220,7 +260,9 @@ covQualNested <- function(input = "x",
     withinC <- list()
     
     for (g in 1:G) {
-        
+      if (mVec[g] == 1){
+        parN <- c(parN, 0L)
+      } else {
         fac <- as.factor(1:(mVec[g] - 1))
         if (within[g] == "Diag") {
             withinC[[g]] <- q1Diag(factor = fac, cov = covWith[g])
@@ -229,19 +271,19 @@ covQualNested <- function(input = "x",
         } else if (within[g] == "CompSymm") {
             withinC[[g]] <- q1CompSymm(factor = fac, cov = covWith[g])
         }
-        
         par <- c(par, coef(withinC[[g]]))
         parUpper <- c(parUpper, coefUpper(withinC[[g]]))
         parLower <- c(parLower, coefLower(withinC[[g]]))
         if (withinC[[g]]@parN) {
-            parNames <- c(parNames,
-                          paste("with", g, withinC[[g]]@kernParNames, sep = "_"))
+          parNames <- c(parNames,
+                        paste("with", g, withinC[[g]]@kernParNames, sep = "_"))
         }
         parN <- c(parN, withinC[[g]]@parN)
+      }
     }
 
     parNCum <- cumsum(parN)
-    
+
     thisCovLevel <- function(par, lowerSQRT = FALSE, compGrad = FALSE) {
                 
         covMatBet <- betweenC@covLevels(par[1L:parNCum[1]], compGrad = compGrad)
@@ -256,30 +298,33 @@ covQualNested <- function(input = "x",
         
         for (g in 1:G) {
             ## cat("within = ", within[g], "\n")
-            indLev <- (igroup == g)
-            nparg <- parNCum[g + 1L] - parNCum[g]
 
-            if (parN[g + 1L]) {
+          if (mVec[g] > 1) {
+              indLev <- (igroup == g)
+              nparg <- parNCum[g + 1L] - parNCum[g]
+              
+              if (parN[g + 1L]) {
                 indPar <- (parNCum[g] + 1L):parNCum[g + 1L]
                 parg <- par[indPar]
-            } else parg <- numeric(0)
+              } else parg <- numeric(0)
             
-            covMatWith <- withinC[[g]]@covLevels(parg,
-                                                 compGrad = compGrad)
-            A <- contrasts(mVec[g])
+              covMatWith <- withinC[[g]]@covLevels(parg,
+                                                   compGrad = compGrad)
+              A <- contrasts(mVec[g])
+              covMatWith2 <- A %*% covMatWith %*% t(A)
             
-            if (compGrad) gradProv <- attr(covMatWith, "gradient")
-            covMatWith2 <- A %*% covMatWith %*% t(A)
-            covMat[indLev, indLev] <- covMat[indLev, indLev] + covMatWith2
-
-            if (compGrad && parN[g + 1L]) {
-                ## XXX il faut sweeper
+              if (compGrad) gradProv <- attr(covMatWith, "gradient")
+              covMat[indLev, indLev] <- covMat[indLev, indLev] + covMatWith2
+            
+              if (compGrad && parN[g + 1L]) {
+                  ## XXX il faut sweeper
                 gradProv2 <- array(0.0, dim = c(mVec[g], mVec[g], parN[g + 1L]))
                 for (i in 1L:parN[g + 1L]) {
                     gradProv2[ , , i] <- A %*% gradProv[ , , i] %*% t(A)
                 }
                 grad[indLev, indLev, indPar] <- grad[indLev, indLev, indPar,
                                                      drop = FALSE] + gradProv2
+              }
             }
         }
         
@@ -291,11 +336,9 @@ covQualNested <- function(input = "x",
 
     nestedLevels <- list(nestedLevels)
     names(nestedLevels) <- input
+    
     covMat <- thisCovLevel(par, lowerSQRT = FALSE, compGrad = FALSE)
 
-    ## print(par)
-    ## print(parNames)
-    
     new("covQualNested",            
         covLevels = thisCovLevel,
         covLevMat = covMat,
@@ -316,7 +359,9 @@ covQualNested <- function(input = "x",
         between = betweenC,             ## NEW
         within = withinC,               ## NEW
         parNCum = parNCum,              ## NEW
-        contrasts = contrasts           ## NEW
+        contrasts = contrasts,          ## NEW
+        ordered = FALSE,
+        intAsChar = intAsChar
         )              
 
 }

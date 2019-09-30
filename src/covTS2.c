@@ -38,7 +38,7 @@ SEXP scores_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 		  SEXP rho) {    // An R environment
   
   int  i, j, ij, k, ell, n, m, d, p, npar, *iparMap = INTEGER(parMap),  
-    ipoint, ipointGrad;
+    ipoint;
  
   double *rxt = REAL(Xt), *rx1_ell, *rx2_ell, *S,
     *rpar = REAL(par), *rpar_ell, *rweights = REAL(weights), *rscores;

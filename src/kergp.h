@@ -56,6 +56,8 @@ SEXP corLev_CompSymm(SEXP par, SEXP nlevels, SEXP lowerSQRT, SEXP compGrad);
 
 SEXP corLev_Symm(SEXP par, SEXP nlevels, SEXP lowerSQRT, SEXP compGrad);
 
+SEXP corLev_LowRank(SEXP par, SEXP nlevels, SEXP rank, SEXP lowerSQRT, SEXP compGrad);
+
 SEXP k1FunExpC(SEXP x);
 
 SEXP k1FunMatern3_2C(SEXP x);

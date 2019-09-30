@@ -1,3 +1,5 @@
+context("SK")
+
 
 ##' Prediction of a Ornstein-Uhlenbeck Gaussian process.
 ##'

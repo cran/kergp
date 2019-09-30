@@ -205,7 +205,8 @@ simulate.gp <- function(object, nsim = 1L, seed = NULL,
     ## compute 'KCond' and its Cholesky root as needed in step 2. 'K'
     ## could be retreived from its Cholesky root?
     ##=========================================================================== 
-    K <- covMat(object$covariance, X = object$X, checkNames = checkNames)
+    K <- covMat(object$covariance, X = object$X, checkNames = checkNames,
+                compGrad = FALSE)
     KStar <- forwardsolve(object$L, K)
     KCond <- K - crossprod(KStar)
     LCond <- t(chol(KCond))
@@ -252,8 +253,8 @@ simulate.gp <- function(object, nsim = 1L, seed = NULL,
     ## STEP 3: now krige the N columns to find 'ZNewSim'
     ##=======================================================================
     
-    kNew <- covMat(object$covariance, X = object$X, Xnew = XNew)
-    KNew <- covMat(object$covariance, X = XNew, Xnew = XNew)
+    kNew <- covMat(object$covariance, X = object$X, Xnew = XNew, compGrad = FALSE)
+    KNew <- covMat(object$covariance, X = XNew, Xnew = XNew, compGrad = FALSE)
     kNewStar <- forwardsolve(object$L, kNew)
     
     KNewCond <- KNew - crossprod(kNewStar)

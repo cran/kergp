@@ -37,6 +37,14 @@
       vector of input names.
 
     }
+    
+    \item{hasGrad}{
+
+      \code{signature(object = "covAll")}: returns the logical slot hasGrad.
+
+    }
+
+    
     \item{simulPar}{
 
       \code{signature(object = "covTS")}: simulates random values for the parameters.

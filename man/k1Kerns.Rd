@@ -18,7 +18,7 @@
  }
 \usage{
 k1Exp
-K1Matern3_2
+k1Matern3_2
 k1Matern5_2
 k1Gauss
 }

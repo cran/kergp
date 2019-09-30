@@ -8,7 +8,7 @@
 }
 \usage{
 
-q1Diag(factor, input = "x", cov = c("corr", "homo", "hete"))
+q1Diag(factor, input = "x", cov = c("corr", "homo", "hete"), intAsChar = TRUE)
 
 }
 \arguments{
@@ -29,6 +29,12 @@ q1Diag(factor, input = "x", cov = c("corr", "homo", "hete"))
     Character telling if the result is a correlation kernel, an
     homoscedastic covariance kernel or an heteroscedastic covariance
     kernel with an arbitrary variance vector.
+    
+  }
+  \item{intAsChar}{
+    
+    Logical. If \code{TRUE} (default), an integer-valued input will be
+    coerced into a character. Otherwise, it will be coerced into a factor.
     
   }
 }

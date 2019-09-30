@@ -428,7 +428,7 @@ setMethod("covMat",
           signature = "covTS", 
           definition = function(object, X, Xnew = NULL,
               compGrad = FALSE, checkNames = TRUE,
-              index = -1L, ...) {
+              index = 1L, ...) {
               
               isXnew <- !is.null(Xnew)
               X <- as.matrix(X)
@@ -466,10 +466,10 @@ setMethod("covMat",
               environment(kernFun) <- rho
 
               if (!isXnew) {
-                  Cov <- .Call("covMat_covTS", kernFun, t(X), par, parM, compGrad, index, rho)
+                  Cov <- .Call(covMat_covTS, kernFun, t(X), par, parM, compGrad, index, rho)
               } else { 
                   if (compGrad) stop("Gradient computation not implemented when Xnew!=NULL")
-                  Cov <- .Call("covMatMat_covTS", kernFun, t(X), t(Xnew), par, parM, 
+                  Cov <- .Call(covMatMat_covTS, kernFun, t(X), t(Xnew), par, parM, 
                                compGrad, index, rho)
               }    
               return(Cov)
@@ -501,7 +501,7 @@ setMethod("scores",
               
               rho <- new.env()
               environment(kernFun) <- rho
-              scores <- .Call("scores_covTS", kernFun, t(X), par, parM, weights, rho)
+              scores <- .Call(scores_covTS, kernFun, t(X), par, parM, weights, rho)
               
           })
 
@@ -536,7 +536,7 @@ setMethod("varVec",
               rho <- new.env()
               environment(kernFun) <- rho
               
-              Var <- .Call("varVec_covTS", kernFun, t(X), par, parM, compGrad, index, rho)
+              Var <- .Call(varVec_covTS, kernFun, t(X), par, parM, compGrad, index, rho)
               
               return(Var)
           })

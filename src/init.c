@@ -1,5 +1,6 @@
 #include <R.h>
 #include <Rinternals.h>
+#include <stdlib.h> // for NULL
 #include "kergp.h"
 
 #include <R_ext/Rdynload.h>
@@ -43,6 +44,7 @@ static const R_CallMethodDef CallEntries[] = {
   CALLDEF(k1Matern5_2C, 3),
   CALLDEF(corLev_CompSymm, 4),
   CALLDEF(corLev_Symm, 4),
+  CALLDEF(corLev_LowRank, 5),
   CALLDEF(k1FunExpC, 1),
   CALLDEF(k1FunMatern3_2C, 1),
   CALLDEF(k1FunMatern5_2C, 1), 

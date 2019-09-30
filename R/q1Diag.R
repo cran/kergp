@@ -155,7 +155,8 @@ corLevDiag <- function(par,
 ##' myCov <- q1Diag(School, input = "School", cov = 2)
 ##' coef(myCov) <- c(1.1, 2.2, 3.3)
 ##' 
-q1Diag <- function(factor, input = "x", cov = c("corr", "homo", "hete")){
+q1Diag <- function(factor, input = "x", cov = c("corr", "homo", "hete"),
+                   intAsChar = TRUE){
 
     cov <- match.arg(cov)
     cov <- match(cov, c("corr", "homo", "hete")) - 1L
@@ -220,6 +221,8 @@ q1Diag <- function(factor, input = "x", cov = c("corr", "homo", "hete")){
         parUpper = parUpper,
         par = par,
         parN = parN,
-        kernParNames = kernParNames)
+        kernParNames = kernParNames,
+        ordered = FALSE,
+        intAsChar = intAsChar)
     
 }

@@ -191,7 +191,7 @@ parseCovFormula <- function(formula, where = .GlobalEnv,
         ## cat(sprintf("o Expression to differentiate\n%s\n\n", strD))
     ## }
     
-    gradExp <- list()
+    gradExp <- parsedGradExp <- list()
     parNamesShort <- character(0)
     
     ## differentiate w.r.t. kernel parameters
@@ -203,6 +203,8 @@ parseCovFormula <- function(formula, where = .GlobalEnv,
             parNamesShort <- c(parNamesShort, ppn)
             gradExp[[ppnLong]] <-
                 sprintf("%s * .%s[ , , \"%s\"]", s, kn, ppn)
+            parsedGradExp[[ppnLong]] <- parse(text = gradExp[[ppnLong]])
+           
         }
     }
     
@@ -211,6 +213,7 @@ parseCovFormula <- function(formula, where = .GlobalEnv,
         ppnLong <- paste(".top", pn, sep = ".")
         parNamesShort <- c(parNamesShort, pn)
         gradExp[[ppnLong]] <- deparse(D(toDer, pn))
+        parsedGradExp[[ppnLong]] <- parse(text = gradExp[[ppnLong]])
     }
     
     names(parNamesShort) <- parNames
@@ -232,7 +235,9 @@ parseCovFormula <- function(formula, where = .GlobalEnv,
          parUpper = parUpper,
          covMatCall = str,
          simpleCall = strD,
-         gradExp = gradExp)
+         parsedSimpleCall = parse(text = strD),
+         gradExp = gradExp,
+         parsedGradExp = parsedGradExp)
     
 }
 

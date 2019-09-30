@@ -5,6 +5,7 @@
 \alias{k1FunMatern3_2}
 \alias{k1FunMatern5_2}
 %%
+\alias{k1Fun1Cos}
 \alias{k1Fun1Exp}
 \alias{k1Fun1PowExp}
 \alias{k1Fun1Gauss}
@@ -28,6 +29,7 @@ k1FunPowExp(x1, x2, par)
 k1FunMatern3_2(x1, x2, par)
 k1FunMatern5_2(x1, x2, par)
 
+k1Fun1Cos(x)
 k1Fun1Exp(x)
 k1Fun1Gauss(x)
 k1Fun1PowExp(x, alpha = 1.5)

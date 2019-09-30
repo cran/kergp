@@ -1,20 +1,29 @@
+k1Fun1Cos <- function(x) {
+  x <- as.vector(x)
+  res <- cos(x)
+  attr(res, "der") <- matrix(NA, nrow = length(x), ncol = 2)
+  attr(res, "der")[, 1] <- - sin(x)
+  attr(res, "der")[, 2] <- - res
+  return(res)
+}
+
 k1Fun1Exp <- function(x) {
     ## XXX should we keep some attributes of 'x' as do classical function
     ## such as 'exp' or 'dnorm'???
     ##
     ## d <- attributes(x)$dim
-    res <- .Call("k1FunExpC", x)
+    res <- .Call(k1FunExpC, x)
     ## attr(res, "dim") <- d
     res
 }
 
 k1Fun1Matern3_2 <- function(x) {
-    res <- .Call("k1FunMatern3_2C", x)
+    res <- .Call(k1FunMatern3_2C, x)
     res
 }
 
 k1Fun1Matern5_2 <- function(x) {
-    res <- .Call("k1FunMatern5_2C", x)
+    res <- .Call(k1FunMatern5_2C, x)
     res
 }
 
@@ -33,11 +42,11 @@ k1Fun1Matern5_2 <- function(x) {
 ##' be an array too. Should dimnames be kept?
 ##' 
 k1Fun1Gauss <- function(x) {
-    res <- .Call("k1FunGaussC", x)
+    res <- .Call(k1FunGaussC, x)
     res
 }
 
 k1Fun1PowExp <- function(x, alpha = 1.5) {
-    res <- .Call("k1FunPowExpC", x, alpha)
+    res <- .Call(k1FunPowExpC, x, alpha)
     res
 }

@@ -228,3 +228,79 @@ optimMethods <- function(optimFun = c("both", "nloptr::nloptr",
 
     df
 }
+
+## *****************************************************************************
+##' Given a list defining groups of levels for a qualitative input,
+##' two vectors of the same length are built: \code{group} gives the
+##' (name of the) group and \code{nestedLevels} gives the nested
+##' levels, i.e. the levels within the groups.
+##' 
+##' @title Translates a List Defining Groups of Levels into two
+##' Character Vectors
+##'
+##' @param groupList A list defining the groups. This must be a list
+##' containing atomic vectors, each defining a group of levels. These
+##' vectors will be coerced to character. If the list is named, then
+##' the names will be used as names for the groups, else default group
+##' names we be given based on \code{prefix} and group numbers, see
+##' \bold{Examples}.
+##'
+##' @param prefix A prefix to identify groups.
+##'
+##' @param sep Separator char used to paste groups and nested levels.
+##' 
+##' @return A list with the two items \code{group} and
+##' \code{nestedLevels}.
+##'
+##' @section Caution: the levels of the wanted input must all appear
+##' exactly once in \code{unlist(groupList)}. We check that the list
+##' does not embed duplicated levels, but we can not tackle missing
+##' levels here.
+##'
+##' @examples
+##' 
+##' gL <- list(letters[1:3], rev(letters[8:4]))
+##' parseGroupList(gL)
+##' parseGroupList(gL, prefix = "G", sep = "-")
+##'
+##' parseGroupList(list(c(1, 2, 5), c(4, 3)))
+##' 
+##' cities <- list("B" = c("AntWerp", "Ghent" , "Charleroi"),
+##'                "F" = c("Paris", "Marseille", "Lyon"),
+##'                "D" = c("Berlin", "Hamburg", "Munchen"))
+##' parseGroupList(cities)
+##'
+##' ## duplicated levels: error
+##' try(parseGroupList(list("a" = c(1, 2, 3), "b" = c(1, 4))))
+##' ## not all names provided: use default names
+##' try(parseGroupList(list("a" = c(1, 2, 3), c(5, 4))))
+##' 
+parseGroupList <- function(groupList, prefix = "gr", sep = "/") {
+
+    flat <- unlist(groupList)
+    if (any(duplicated(flat))) {
+        stop("'groupList' contains duplicated elements")
+    }
+    
+    if (is.null(names(groupList)) || any(names(groupList) == "")) {
+        ng <- paste0(prefix, 1:length(groupList))
+    } else {
+        ng <-  names(groupList)
+    }
+
+    lg <- sapply(groupList, length)
+    
+    group <- character(0)
+    nestedLevels <- character(0)
+    for (i in seq_along(lg)) {
+        group <- c(group, rep(ng[i], lg[i]))
+        nestedLevels <-
+            c(nestedLevels, paste(ng[i], groupList[[i]], sep = sep))
+    }
+    
+    list(group = group,
+         nestedLevels = nestedLevels,
+         levels = flat)
+
+}
+

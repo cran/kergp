@@ -8,7 +8,7 @@
 \usage{
 
 corLevSymm(par, nlevels, levels, lowerSQRT = FALSE, compGrad = TRUE,
-  cov = 0, impl = c("C", "R"))
+           cov = 0, impl = c("C", "R"))
 
 }
 
@@ -16,16 +16,16 @@ corLevSymm(par, nlevels, levels, lowerSQRT = FALSE, compGrad = TRUE,
 
   \item{par}{
 
-    A numeric vector with length \code{npCor + npVar} where \code{npCor
-      = nlevels * (nlevels - 1) / 2} is the number of correlation
-      parameters, and \code{npVar} is the number of variance parameters,
-      which depends on the value of \code{cov}. The value of
-      \code{npVar} is \code{0}, \code{1} or \code{nlevels} corresponding
-      to the values of \code{cov}: \code{0}, \code{1} and \code{2}. The
-      correlation parameters are assumed to be located at the head of
-      \code{par} i.e. at indices \code{1} to \code{npCor}. The variance
-      parameter(s) are assumed to be at the tail, i.e. at indices
-      \code{npCor +1 } to \code{npCor + npVar}.
+    A numeric vector with length \code{npCor + npVar} where
+    \code{npCor = nlevels *} \code{(nlevels - 1) / 2} is the number of
+    correlation parameters, and \code{npVar} is the number of variance
+    parameters, which depends on the value of \code{cov}. The value of \code{npVar}
+    is \code{0}, \code{1} or \code{nlevels} corresponding to the values
+    of \code{cov}: \code{0}, \code{1} and \code{2}. The correlation
+    parameters are assumed to be located at the head of \code{par}
+    i.e. at indices \code{1} to \code{npCor}. The variance parameter(s)
+    are assumed to be at the tail, i.e. at indices \code{npCor + 1 } to
+    \code{npCor + npVar}.
 
 }
 \item{nlevels}{
@@ -57,8 +57,8 @@ corLevSymm(par, nlevels, levels, lowerSQRT = FALSE, compGrad = TRUE,
   Integer \code{0}, \code{1} or \code{2}. If \code{cov} is \code{0}, the
   matrix is a \emph{correlation} matrix (or its Cholesky root). If
   \code{cov} is \code{1} or \code{2}, the matrix is a \emph{covariance}
-  (or its Cholesky root) with constant variance vector for \code{code =
-  1} and with arbitrary variance for \code{code = 2}. The variance
+  (or its Cholesky root) with constant variance vector for
+  \code{code = 1} and with arbitrary variance for \code{code = 2}. The variance
   parameters \code{par} are located at the tail of the \code{par}
   vector, so at locations \code{npCor + 1} to \code{npCor + nlevels}
   when \code{code = 2} where \code{npCor} is the number of correlation
@@ -99,7 +99,11 @@ corLevSymm(par, nlevels, levels, lowerSQRT = FALSE, compGrad = TRUE,
 }
 \note{
 
-  Here the parameters \eqn{\theta_{ij}}{theta[i, j]} are used \emph{in
+  This function is essentially for internal use and the corresponding
+  correlation or covariance kernels are created as \code{covQual}
+  objects by using the \code{\link{q1Symm}} creator. 
+
+  The parameters \eqn{\theta_{ij}}{theta[i, j]} are used \emph{in
     row order} rather than in the column order as in the reference or in the
   \pkg{nlme} package. This order simplifies the computation of the
   gradients.

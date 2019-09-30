@@ -63,10 +63,11 @@ covMan <- function(kernel,
 
 setMethod("covMat",
           signature = "covMan", 
-          definition = function(object, X, Xnew, compGrad = FALSE, 
-                                checkNames = NULL, index = -1L, ...) {
+          definition = function(object, X, Xnew, compGrad = hasGrad(object), 
+                                checkNames = NULL, index = 1L, ...) {
 
               isXnew <- !is.null(Xnew)
+              if (isXnew) compGrad <- FALSE
               ## X <- as.matrix(X)
               
               if (is.null(checkNames)) {
@@ -98,8 +99,8 @@ setMethod("covMat",
               
               if (compGrad) {
                   if ((index < 1L) || (index > object@parN)) {
-                      warning("Bad index passed to 'covMat' with 'gradComp = TRUE'. ",
-                              "Setting 'gradComp' to FALSE.")
+                    stop("when 'compGrad' is TRUE, 'index' must",
+                         " be between 1 and npar(object)")
                   }
               }
               compGrad <- as.integer(compGrad)
@@ -109,11 +110,11 @@ setMethod("covMat",
               rho <- new.env()
               environment(kernFun) <- rho        
               if (!isXnew){
-                  Cov <- .Call("covMat_covMan", kernFun, t(X), par, 
+                  Cov <- .Call(covMat_covMan, kernFun, t(X), par, 
                                compGrad, index, rho)
               } else { 
                   if (compGrad) stop("Gradient computation not implemented when Xnew != NULL")
-                  Cov <- .Call("covMatMat_covMan", kernFun, t(X), t(Xnew), par, 
+                  Cov <- .Call(covMatMat_covMan, kernFun, t(X), t(Xnew), par, 
                                compGrad, index, rho)
               }          
               return(Cov) 
@@ -171,7 +172,7 @@ setMethod("varVec",
               kernFun <- object@kernel
               rho <- new.env()
               environment(kernFun) <- rho        
-              Var <- .Call("varVec_covMan", kernFun, t(X), par, 
+              Var <- .Call(varVec_covMan, kernFun, t(X), par, 
                            compGrad, index, rho)
               
               return(Var) 
@@ -337,7 +338,7 @@ setMethod("scores",
             kernFun <- object@kernel
             rho <- new.env()
             environment(kernFun) <- rho
-            scores <- .Call("scores_covMan", kernFun, t(X), par, weights, rho)
+            scores <- .Call(scores_covMan, kernFun, t(X), par, weights, rho)
             
           })
 

@@ -13,11 +13,11 @@
 
 }
 \usage{
-\S4method{covMat}{covMan}(object, X, Xnew, compGrad = FALSE, 
-       checkNames = NULL, index = -1L, ...)
+\S4method{covMat}{covMan}(object, X, Xnew, compGrad = hasGrad(object), 
+       checkNames = NULL, index = 1L, ...)
 
 \S4method{covMat}{covTS}(object, X, Xnew, compGrad = FALSE, 
-       checkNames = TRUE, index = -1L, ...)
+       checkNames = TRUE, index = 1L, ...)
 }
 \arguments{
   \item{object}{
@@ -27,7 +27,7 @@
   }
   \item{X}{
 
-    The usual matrix of spatial design points, with \eqn{n} rows and
+    The matrix (or data.frame) of design points, with \eqn{n} rows and
     \eqn{d} cols where \eqn{n} is the number of spatial points and
     \eqn{d} is the 'spatial' dimension.
 
@@ -56,7 +56,7 @@
   \item{index}{
 
     Integer giving the index of the derivation parameter in the official
-    order.
+    order. Ignored if \code{compGrad = FALSE}.
 
   }
   \item{...}{

@@ -8,7 +8,7 @@
 }
 \usage{
 
-q1CompSymm(factor, input = "x", cov = c("corr", "homo"))
+q1CompSymm(factor, input = "x", cov = c("corr", "homo"), intAsChar = TRUE)
 
 }
 \arguments{
@@ -22,11 +22,17 @@ q1CompSymm(factor, input = "x", cov = c("corr", "homo"))
     Name of (qualitative) input for the kernel.
 
   }
-  \item{cov}{.
+  \item{cov}{
 
     Character telling if the kernel is a correlation kernel or a
     homoscedastic covariance kernel.
 
+  }
+  \item{intAsChar}{
+    
+    Logical. If \code{TRUE} (default), an integer-valued input will be
+    coerced into a character. Otherwise, it will be coerced into a factor.
+    
   }
 }
 \value{
@@ -52,6 +58,7 @@ q1CompSymm(factor, input = "x", cov = c("corr", "homo"))
 School <- factor(1L:3L, labels = c("Bad", "Mean" , "Good"))
 myCor <- q1CompSymm(School, input = "School")
 coef(myCor) <- 0.26
+plot(myCor, type = "cor")
 
 ## Use a data.frame with a factor
 set.seed(246)
@@ -60,10 +67,6 @@ newSchool <- factor(sample(1L:3L, size = 20, replace = TRUE),
 C1 <- covMat(myCor, X = data.frame(School = newSchool),
              compGrad = FALSE, lowerSQRT = FALSE)
 
-## or use a matrix with integer content
-C2 <- covMat(myCor, X = cbind(School = as.integer(newSchool)),
-             compGrad = FALSE, lowerSQRT = FALSE)
-max(abs(C1 - C2))
 }
 \seealso{
   

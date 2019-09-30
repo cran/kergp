@@ -1,22 +1,22 @@
 
 k1FunExp <- function(x1, x2, par) {
-  res <- .Call("k1ExpC", x1, x2, par)
+  res <- .Call(k1ExpC, x1, x2, par)
 }
 
 k1FunGauss <- function(x1, x2, par) {
-  res <- .Call("k1GaussC", x1, x2, par)
+  res <- .Call(k1GaussC, x1, x2, par)
 }
 
 k1FunPowExp <- function(x1, x2, par) {
-  res <- .Call("k1PowExpC", x1, x2, par)
+  res <- .Call(k1PowExpC, x1, x2, par)
 }
 
 k1FunMatern3_2<- function(x1, x2, par) {
-  res <- .Call("k1Matern3_2C", x1, x2, par)
+  res <- .Call(k1Matern3_2C, x1, x2, par)
 }
 
 k1FunMatern5_2 <- function(x1, x2, par) {
-  res <- .Call("k1Matern5_2C", x1, x2, par)
+  res <- .Call(k1Matern5_2C, x1, x2, par)
 }
 
 k1Exp <- new("covMan",            

@@ -11,7 +11,7 @@ setMethod("mle",
                        varNoiseIni = var(y) / 10,
                        varNoiseLower = 0,
                        varNoiseUpper = Inf,
-                       compGrad = TRUE,
+                       compGrad = hasGrad(object),
                        doOptim = TRUE,
                        optimFun = c("nloptr::nloptr", "stats::optim"),
                        optimMethod = ifelse(compGrad, "NLOPT_LD_LBFGS",
@@ -25,6 +25,11 @@ setMethod("mle",
                        checkNames = TRUE,
                        ...) {
                   
+                  if (compGrad && !hasGrad(object)) {
+                      stop("when 'compGrad' is given and is TRUE, 'cov' object ",
+                           "must compute the gradient")
+                  }
+                
                   optimFun <- match.arg(optimFun)
                   if ((optimFun == "stats::optim") && missing(optimMethod)) {
                       optimMethod <- "L-BFGS-B"
@@ -332,7 +337,9 @@ setMethod("mle",
                                               args <- list(x0 = parIni[i, ], eval_f = negLogLikFun, 
                                                            lb = parLower, ub = parUpper)
                                               args <- c(args, Ldots)
-                                              do.call(nloptr::nloptr, args = args)  # try removed, due to conflicts with errorhandling (thanks Mickael Binois!)
+                                              do.call(nloptr::nloptr, args = args)
+                                              ## try removed, due to conflicts with
+                                              ## '.errorhandling' (thanks Mickael Binois!)
                                           })
                               }
                               
@@ -346,7 +353,7 @@ setMethod("mle",
                                        par = t(sapply(fitList, function(x) x$solution)),         
                                        logLik = - sapply(fitList, function(x) x$objective),
                                        nIter  = sapply(fitList, function(x) x$iterations),
-                                       convergence = sapply(fitList, function(x) x$status > 0))
+                                       convergence = sapply(fitList, function(x) x$status %in% c(1, 3, 4)))
                               colnames(report$par) <- colnames(report$parIni)
                               if (trace > 0) {
                                   cat("\nOptimisation report:\n\n")
@@ -370,7 +377,8 @@ setMethod("mle",
                               if (!inherits(opt, "try-error")) {
                                   opt$par <- opt$solution
                                   opt$value <- -opt$objective
-                                  opt$convergence <- opt$status == 0
+                                  ## see 'opt$status' to get more info
+                                  opt$convergence <- opt$status %in% c(1, 3, 4)
                               }
                           }
                           

@@ -15,6 +15,7 @@
 \alias{show,covComp-method}
 \alias{scores,covComp-method}
 \alias{varVec,covComp-method}
+\alias{as.list,covComp-method}
 
 \title{
 
@@ -130,6 +131,15 @@
 \section{Methods}{
   
   \describe{
+    
+    \item{as.list}{
+      
+      \code{signature(object = "covComp")}: coerce \code{object} into a
+      list of covariance kernels, each inheriting from the virual class
+      \code{"covAll"}. This is useful e.g., to extract the coefficients
+      or to plot a covariance component.
+      
+    }
     \item{checkX}{
       
       \code{signature(object = "covComp", X = "data.frame")}: check that

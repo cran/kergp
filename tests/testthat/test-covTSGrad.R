@@ -1,3 +1,5 @@
+context("covTS")
+
 ## require (numDeriv)  now in 'Depends'
 precision <- 1e-6
 

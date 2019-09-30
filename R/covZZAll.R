@@ -10,10 +10,18 @@ setClassUnion("covAll",
 ## 'inputNames'
 ##
 ## XXX   This method should be removed for classes inheriting from
-##       "covKernel", excpet if inputnames are stored under another
+##       "covKernel", except if inputnames are stored under another
 ##       name.
 ## 
 ##***********************************************************************
+setMethod("hasGrad",
+          signature = signature(object = "covAll"),
+          definition = function(object, ...){
+            if ("hasGrad" %in% slotNames(object)) {
+              object@hasGrad
+            } else return(FALSE)
+          })
+
 setMethod("inputNames",
           signature = signature(object = "covAll"),
           definition = function(object, ...){
@@ -163,7 +171,7 @@ setMethod("simulate",
                   RNGstate <- structure(seed, kind = as.list(RNGkind()))
                   on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
               }
-              C <- covMat(object, X = X, checkNames = checkNames)
+              C <- covMat(object, X = X, checkNames = checkNames, compGrad = FALSE)
               n <- ncol(C)
               if (is.null(mu)) {
                   mu <- rep(0, n)

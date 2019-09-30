@@ -220,11 +220,12 @@ covRadial <- function(k1Fun1 = k1Fun1Gauss,
 setMethod("covMat",
           signature = "covRadial", 
           definition = function(object, X, Xnew,
-              compGrad = FALSE,
+              compGrad = hasGrad(object),
               deriv = 0,
               checkNames = NULL, ...) {
               
               isXNew <- !is.null(Xnew)
+              if (isXNew) compGrad <- FALSE
               
               ## ==============================================================
               ## Specific checks related to 'deriv'.
@@ -246,8 +247,10 @@ setMethod("covMat",
               ## ==============================================================
               ## The kernel has only continuous (numeric) inputs...
               ## ==============================================================
-      
-              X <- as.matrix(X)
+
+              ## Moved after checkNames, or the matrix may be of mode
+              ## "character!!!
+              ## X <- as.matrix(X)
               
               if (is.null(checkNames)) {
                   checkNames <- TRUE 
@@ -263,13 +266,15 @@ setMethod("covMat",
       
               if (checkNames) X <- checkX(object, X = X)
               if (any(is.na(X))) stop("'X' must not contain NA elements")
-
+              X <- as.matrix(X)
+              
               if (isXNew){
                   ## XXX unclear for now if 'Xnew' being a vector is
                   ## accepted or not
                   ##
                   ## Xnew <- as.matrix(Xnew)
                   if (checkNames) Xnew <- checkX(object, X = Xnew)
+                  Xnew <- as.matrix(Xnew)
                   if (ncol(X) != ncol(Xnew)) {
                       stop("'X' and 'Xnew' must have the same number of columns")
                   }

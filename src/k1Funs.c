@@ -199,7 +199,7 @@ SEXP k1FunPowExpC(SEXP x, SEXP alpha) {   /* x = site                          *
   INTEGER(dd)[1] = 1; 
   PROTECT(grad = allocArray(REALSXP, dd));
   
-  double z, emz, *rx = REAL(x), *rvalue = REAL(value),
+  double z, *rx = REAL(x), *rvalue = REAL(value),
     *rder = REAL(der), *rgrad = REAL(grad), *ralpha = REAL(alpha);
   
   for (i = 0; i < n; i++) {

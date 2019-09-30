@@ -4,55 +4,72 @@
 #define NODEBUG 
 
 /*============================================================================*
-   
+  
   NOTE
 
   This program is part of the 'kergp' R package.
 
   GOAL
 
-  Compute a correlation matrix or its Cholesky lower root using the
-  general "spherical" (or "Cholesky") parameterisation of Pinheiro and
-  Bates.
+  Compute a correlation matrix with given maximum rank 'r' with r >=
+  2, or its Cholesky-like lower triangular root using the
+  parameterization of Rapisarda et al, further studied by Grubisic &
+  Pietersz . See the help pages to get the precise references.
 
   AUTHOR 
 
-  Yves Deville <deville.yves@alpestat.com> adapting existing codes by
-  Douglas M. Bates Jose C. Pinheiro (nlme package), and by Eperan
-  Padonou.
+  Yves Deville <deville.yves@alpestat.com>
   
   CAUTION 
 
-  The parameters are the angles between O and pi. THEY ARE ASSUMED TO
-  BE GIVEN IN ROW ORDER theta[1, 1], theta[2, 1], theta[2, 2],
-  theta[3, 1], ...
+  The parameters are the angles assumed theta[i, j] as in Rapisarda et
+  al, assumed to be given IN ROW ORDER theta[1, 1], theta[2, 1],
+  theta[2, 2], theta[3, 1], ...  All angles are between 0 and pi
+  except Theta[i, 1] for i from 1 to r with classical indexing. These
+  angles are between 0 and 2 * pi so the diagonal elements of the root
+  matrix 'L' can be negative. Note also that the factorisation C = L
+  L^T of the correlation matrix (with L of dimension m * r) is NOT
+  unique.
 
   DETAILS
       
   'ell' is an index referring to the 'par' array, so 'ell' ranges from
-  0 to m * (m - 1) / 2.  'ell_k' and ell_i are other such indices used
+  0 to (r - 1)  * (m - r / 2).  'ell_k' and ell_i are other such indices used
   to cope with elements in row 'i'.
 
  *============================================================================*/
 
-SEXP corLev_Symm(SEXP par, 
-		 SEXP nlevels,
-		 SEXP lowerSQRT,
-		 SEXP compGrad) {
-
-  int i, j, k, npar = LENGTH(par), m = INTEGER(nlevels)[0], 
-    m2 = m * m, ell, ell_i, ell_k, ell_m =  m * (m - 1) / 2;
-
-  if (npar != ell_m) {
-    error("length of 'par' not equal to 'm * (m - 1) / 2'");
-  }
+SEXP corLev_LowRank(SEXP par, 
+		    SEXP nlevels,
+		    SEXP rank,
+		    SEXP lowerSQRT,
+		    SEXP compGrad) {
   
+  int i, j, k, npar = LENGTH(par), m = INTEGER(nlevels)[0],
+    r = INTEGER(rank)[0], minir, minjr,
+    m2 = m * m, ell, ell_i, ell_k, ell_m =  (r - 1) * (2 * m - r) / 2;
+
   double aux, eps = 1e-8;
   
   /* 'Dbg' is used in place of compiler directive to avoid
      indentation bugs with emacs. */
   
   int Dbg = 0;
+  
+  if (Dbg) {  
+    Rprintf("compGrad = %d, lowerSQRT = %d\n", INTEGER(compGrad)[0], 
+	    INTEGER(lowerSQRT)[0]);
+    Rprintf("m = %d, r = %d, npar = %d, m2 = %d\n", m, r, npar, m2);
+  }
+  
+  if (npar != ell_m) {
+    error("length of 'par' not equal to '(rank - 1) * (m - rank / 2)'");
+  }
+  
+  if (r < 2) {
+    error("'rank' must be >= 2");
+  }
+  
   SEXP cor;
 
   PROTECT(par = coerceVector(par, REALSXP));
@@ -61,18 +78,13 @@ SEXP corLev_Symm(SEXP par,
   PROTECT(cor = allocMatrix(REALSXP, m, m));
   double *rcor = REAL(cor);
 
-  if (Dbg) {  
-    Rprintf("compGrad = %d, lowerSQRT = %d\n", INTEGER(compGrad)[0], 
-	    INTEGER(lowerSQRT)[0]);
-    Rprintf("m = %d, npar = %d, m2 = %d\n", m, npar, m2);
-  }
 
   if (INTEGER(compGrad)[0]) {
 
     int *ells = (int *) R_alloc(m + 1, sizeof(int));
     ells[m] =  ell_m;
-    double *c = (double *) R_alloc(m, sizeof(double));
-    double *s = (double *) R_alloc(m, sizeof(double));
+    double *c = (double *) R_alloc(r, sizeof(double));
+    double *s = (double *) R_alloc(r, sizeof(double));
  
     SEXP dcor, attrNm;
     
@@ -108,8 +120,10 @@ SEXP corLev_Symm(SEXP par,
       aux = 1.0;
       
       if (Dbg) Rprintf("row i = %d ell_i = %d\n", i, ell_i);
+
+      minir = (i <= (r - 1)) ? i : (r - 1);
       
-      for (j = 0; j < i; j++) {
+      for (j = 0; j < minir; j++) {
 	
 	c[j] = cos(rpar[ell]);
 	s[j] = sin(rpar[ell]);
@@ -125,14 +139,14 @@ SEXP corLev_Symm(SEXP par,
 	  if (s[k] > eps) { 
 	    rdcor[i + j * m + ell_k * m2] =  rcor[i + j * m] * c[k] / s[k];
 	    if (Dbg) {
-	      Rprintf("   deriv. i = %d, j = %d w.r.t. par[%d]\n", i, j, ell_k);
+	      Rprintf("   (1) deriv. i = %d, j = %d w.r.t. par[%d]\n", i, j, ell_k);
 	    }
 	  } 
 	  
 	  ell_k++;
 	  
 	}
-	
+
 	/* now derivative for k = j.  Note that the following could
 	   work when the angle theta_{ij} is not pi / 2.  
 
@@ -142,7 +156,7 @@ SEXP corLev_Symm(SEXP par,
 	*/
 	rdcor[i + j * m + ell_k * m2] = - aux;
 	if (Dbg) {
-	  Rprintf("   deriv. i = %d, j = %d w.r.t. par[%d]\n", i, j, ell_k);
+	  Rprintf("   (2) deriv. i = %d, j = %d w.r.t. par[%d]\n", i, j, ell_k);
 	}
 	
 	ell++;
@@ -150,25 +164,32 @@ SEXP corLev_Symm(SEXP par,
       }
       
       /* diagonal element */
-      rcor[i + i * m] =  aux;     
+      rcor[i + minir * m] =  aux;     
       
       /* derivatives for k < i  */
       ell_k = ell_i;
       
-      for (k = 0; k < i; k++) { 	
+      for (k = 0; k < minir; k++) {
 	
-	if (s[k] > eps) { 
-	  rdcor[i + i * m + ell_k * m2] =  rcor[i + i * m] * c[k] / s[k];
-	  if (Dbg) {
-	    Rprintf("   deriv. i = %d, j = %d w.r.t. par[%d]\n", i, j, ell_k);
-	  }
-	} 
+	if (Dbg) {
+	  Rprintf("   (3) deriv. i = %d, j = %d w.r.t. par[%d]\n", i, j, ell_k);
+	}
+
+	if (fabs(s[k]) > eps) {	  
+	  rdcor[i + minir * m + ell_k * m2] =  rcor[i + minir * m] * c[k] / s[k];
+	}
+	else {
+	  if (Dbg) Rprintf("s[k] = 0\n");
+	}
+	
 	ell_k++;
 	
       }
       
     }
-
+    
+    if (Dbg) Rprintf(" end derivatives\n");
+      
     /*========================================================================
       Now compute the correlation matrix from its lower Cholesky square root
       ========================================================================*/
@@ -196,7 +217,9 @@ SEXP corLev_Symm(SEXP par,
       for (i = 0; i < m; i++) {
 	for (j = 0; j <= i; j++) {
 	  aux = 0.0;
-	  for (k = 0; k <= j; k++) {
+	  minjr = (j <= r) ? j : r;
+	  
+	  for (k = 0; k <= minjr; k++) {
 	    aux += rcor[i + k * m] * rcor[j + k * m]; 
 	  }
 	  temp[i + j * m] = aux;
@@ -205,14 +228,17 @@ SEXP corLev_Symm(SEXP par,
       }
 	
       for (i = 0; i < m; i++) {
-	for (j = 0; j <= i; j++) {	  
-	  for (k = 0; k <= j; k++) {
+	for (j = 0; j <= i; j++) {
+
+	  minjr = (j <= r ) ? j : r;
 	    
-	    /*================================================================
+	  for (k = 0; k <= minjr; k++) {
+	    
+	    /*==================================================================
 	      the following two loops do what a single huge loop for
 	      ell = 0 to npar would do, but remind that most of
 	      derivatives in 'rdcor' are zero.
-	      ================================================================*/
+	      ==================================================================*/
 	    
 	    ell_k = ells[j] + k;
 	    if (ell_k >= ell_m) ell_k = ell_m - 1;
@@ -279,14 +305,15 @@ SEXP corLev_Symm(SEXP par,
     for (i = 0; i < m; i++)  {
       
       aux = 1.0;
-      
-      for (j = 0; j < i; j++) {	
+      minir = (i <= (r - 1)) ? i : (r - 1);
+	 
+      for (j = 0; j < minir; j++) {	
 	rcor[i + j * m] =  cos(rpar[ell]) * aux; 
 	aux *= sin(rpar[ell]); 
-	  ell++;
+	ell++;
       }
       
-      rcor[i + i * m] = aux;
+      rcor[i + minir * m] = aux;
       
     }
     
@@ -301,7 +328,8 @@ SEXP corLev_Symm(SEXP par,
       for (i = 0; i < m; i++) {
 	for (j = 0; j <= i; j++) {
 	  aux = 0.0;
-	  for (k = 0; k <= j; k++) {
+	  minjr = (j <= r) ? j : r;
+	  for (k = 0; k <= minjr; k++) {
 	    aux += rcor[i + k * m] * rcor[j + k * m]; 
 	  }
 	  temp[i + j * m] = aux;

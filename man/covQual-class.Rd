@@ -137,6 +137,24 @@
       \code{"var"}, \code{"sigma2"} are popular names.
 
     }
+    \item{\code{ordered}:}{
+
+      Vector of class \code{"logical"} indicating whether the factors
+      are ordered or not.
+    
+    }
+    \item{\code{intAsChar}:}{
+
+      Object of class \code{"logical"} indicating how to cope with an
+      integer input. When \code{intAsChar} is \code{TRUE} the input is
+      coerced into a character; the values taken by this character
+      vector should then match the levels in the \code{covQual} object
+      as given by \code{levels(object)[[1]]}. If instead
+      \code{intAsChar} is \code{FALSE}, the integer values are assumed
+      to correspond to the levels of the \code{covQual} object in the
+      same order.
+      
+    }
   }
 }
 \section{Methods}{
@@ -206,6 +224,9 @@
       parameters.
 
     }
+    
+    \item{plot}{\code{signature(x = "covQual")}: see \code{\link{plot,covQual-method}}. }
+
     \item{scores}{
 
       \code{signature(object = "covQual")}: return the vector of

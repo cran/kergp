@@ -65,22 +65,15 @@ gp <- function(formula, data,
     d <- ncol(X)
     
     if (estim) {
-        if (is(cov, "covMan")) {
-            ## this is the default value in mle, hence...
-            LCall <- as.list(Call)
-            if (!("compGrad" %in% names(LCall))) compGrad <- TRUE
-            else compGrad <- eval(LCall[["compGrad"]])
-            if (compGrad && !cov@hasGrad) {
-                stop("when 'compGrad' is given and is TRUE, 'cov' object ",
-                     "must compute the gradient")
-            }
-        }
         
         fit <- try(mle(object = cov,
-                       y = y, X = X, F = F,
+                   y = y, X = X, F = F,
                        ...))
 
-        if (inherits(fit, "try-error")) stop("Maximum Likelihood error")
+        if (inherits(fit, "try-error")){
+          covMat(cov, X = X)
+          stop("Maximum Likelihood error")
+        } 
         optValue <- fit$opt$val
         ## replace 'cov'.
         cov <- fit$cov

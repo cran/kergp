@@ -35,6 +35,11 @@ if (!isGeneric("kernelName")) {
 ## Extract or set the names of the inputs. The are usesd for 'official'
 ## validations in kergp.
 ##=======================================================================
+if (!isGeneric("hasGrad")) {
+  setGeneric("hasGrad",
+             function(object, ...) standardGeneric("hasGrad")
+  )
+}
 if (!isGeneric("inputNames")) {
   setGeneric("inputNames",
              function(object, ...) standardGeneric("inputNames")

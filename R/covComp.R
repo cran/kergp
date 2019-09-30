@@ -212,7 +212,10 @@ setMethod("checkX",
 ## **********************************************************************
 
 .covMat_covComp <- function(object, X, Xnew = NULL,
-                           compGrad = FALSE, checkNames = NULL, index = -1L) {    
+                           compGrad = compGrad, checkNames = NULL, index = -1L) {    
+    
+    isXnew <- !is.null(Xnew)
+    if (isXnew) compGrad <- FALSE
     
     pf <- object@parsedFormula
     
@@ -230,10 +233,11 @@ setMethod("checkX",
         assign(x = tpn, value = val)
     }
             
-    C <- eval(parse(text = pf$simpleCall))
+    ## C <- eval(parse(text = pf$simpleCall))
+    C <- eval(pf$parsedSimpleCall)
     
     if (compGrad) {
-        if (!is.null(Xnew)) {
+        if (isXnew) {
             stop("'compGrad = TRUE' is not implemented for the case where ",
                  "'Xnew' is not NULL")
         }
@@ -242,9 +246,10 @@ setMethod("checkX",
         np <- length(parNames)
         dC <- array(NA,
                    dim = c(n, n, np),
-                   dimnames = list(NULL, NULL, parNames))
+                    dimnames = list(NULL, NULL, parNames))        
         for (pn in parNames) {
-            dC[ , , pn] <- eval(parse(text = pf$gradExp[[pn]]))
+            ## dC[ , , pn] <- eval(parse(text = pf$gradExp[[pn]]))
+            dC[ , , pn] <- eval(pf$parsedGradExp[[pn]])
         }
         attr(C, "gradient") <- dC
     }
@@ -261,7 +266,7 @@ setMethod("checkX",
 setMethod("covMat",
           signature = signature(object = "covComp"), 
           definition = function(object, X, Xnew,
-              compGrad = FALSE, checkNames = NULL, index = -1L) {
+              compGrad = hasGrad(object), checkNames = NULL, index = -1L) {
               
               .covMat_covComp(object = object, X = X, Xnew = Xnew,
                              compGrad = compGrad,
@@ -298,7 +303,8 @@ setMethod("covMat",
         assign(x = tpn, value = val)
     }
             
-    V <- eval(parse(text = pf$simpleCall))
+    ## V <- eval(parse(text = pf$simpleCall))
+    V <- eval(pf$parsedSimpleCall)
     names(V) <- rownames(X)
     
     if (compGrad) {
@@ -310,8 +316,10 @@ setMethod("covMat",
                    dim = c(n, np),
                    dimnames = list(NULL, parNames))
         for (pn in parNames) {
-            dV[ , pn] <- eval(parse(text = pf$gradExp[[pn]]))
+            ## dV[ , pn] <- eval(parse(text = pf$gradExp[[pn]]))
+            dV[ , pn] <- eval(pf$parsedGradExp[[pn]])
         }
+        
         attr(C, "gradient") <- dV
     }
     
@@ -467,3 +475,11 @@ setMethod("scores",
               return(scores)
               
           })
+
+##***********************************************************************
+## Coercion into a list: useful to get the kernels after an estimation.
+##***********************************************************************
+
+setMethod(f = "as.list",
+          signature = signature(x = "covComp"),
+          definition = function(x) x@covAlls)

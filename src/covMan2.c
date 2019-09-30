@@ -33,7 +33,7 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   int  i, j, ij, k, n, m, ipar, d, npar;
   
   double *rxt = REAL(Xt), *rx1, *rx2,
-    *rpar = REAL(par), *rweights = REAL(weights), *rscores;
+    *rweights = REAL(weights), *rscores;
   
   SEXP dimXt, R_fcall, x1, x2,
     kernValue, dkernValue,  attrNm, scores;
@@ -57,7 +57,8 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   PROTECT(par = coerceVector(par, REALSXP));
   npar = LENGTH(par);
 
-#ifdef DEBUG 
+#ifdef DEBUG
+  double *rpar = REAL(par)
   for (ipar = 0; ipar < npar; ipar++) {
     Rprintf("par[%d] = %7.3f  ", ipar, rpar[ipar]);
   }

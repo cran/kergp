@@ -24,7 +24,7 @@ SEXP covMat_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
 		   SEXP rho) {    // An R environment
   
   int  i, j, k, n, d;   //*icompGrad;
-  double *rxt = REAL(Xt), *rx1, *rx2, *rCov, *rpar;
+  double *rxt = REAL(Xt), *rx1, *rx2, *rCov;
   SEXP R_fcall, Cov, x1, x2;
   
   if (!isFunction(fun)) error("'fun' must be a function");
@@ -50,7 +50,6 @@ SEXP covMat_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
   rCov = REAL(Cov);
   rx1 = REAL(x1);
   rx2 = REAL(x2);
-  rpar = REAL(par);
 
 #ifdef DEBUG 
   Rprintf("REAL fait\n");
@@ -174,11 +173,11 @@ SEXP covMatMat_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 		       SEXP index,    // NOT USED
 		       SEXP rho) {    // An R environment
   
-  int  i, j, k, n1, n2, d, p, npar;
+  int  i, j, k, n1, n2, d;
   
   double *rx1t = REAL(X1t),  *rx2t = REAL(X2t),  
     *rx1, *rx2,
-    *rCov, *rpar = REAL(par);
+    *rCov;
   
   SEXP dimX1t, dimX2t, x1, x2, R_fcall, Cov;
   
@@ -211,12 +210,10 @@ SEXP covMatMat_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   rCov = REAL(Cov);
   rx1 = REAL(x1);
   rx2 = REAL(x2);
-  rpar = REAL(par);
 
   PROTECT(R_fcall = lang4(fun, x1, x2, par));
   
   /* check the parameters arrays  */
-  npar = LENGTH(par);
   par = PROTECT(coerceVector(par, REALSXP));
   
   if ( INTEGER(compGrad)[0] ) {
@@ -279,7 +276,7 @@ SEXP varVec_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
 		   SEXP rho) {    // An R environment
   
   int  i, k, n, d;   //*icompGrad;
-  double *rxt = REAL(Xt), *rx1, *rVar, *rpar;
+  double *rxt = REAL(Xt), *rx1, *rVar;
   SEXP R_fcall, Var, x1;
   
   if (!isFunction(fun)) error("'fun' must be a function");
@@ -299,7 +296,6 @@ SEXP varVec_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
 
   rVar = REAL(Var);
   rx1 = REAL(x1);
-  rpar = REAL(par);
 
   PROTECT(R_fcall = lang4(fun, x1, x1, par));
   SETCADDDR(R_fcall, par);

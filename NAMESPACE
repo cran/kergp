@@ -7,14 +7,15 @@ import("Rcpp")
 import("testthat")
 import("nloptr")
 import("doFuture")
+importFrom("lattice", "levelplot")
 importFrom("stats", "predict", "influence", "coef", "coefficients", "simulate",
-           "contr.helmert", "D")
+           "contr.helmert", "D", "pbeta", "cov2cor")
 importFrom("stats4", "coef")
 importFrom("parallel", "makeCluster", "stopCluster")
 importFrom("doParallel", "registerDoParallel")
 ## importFrom("DiceKriging", "coef<-")
 
-importFrom("graphics", "par",
+importFrom("graphics", "par", "axis",
            "plot", "lines", "points",
            "matplot", "matlines", "matpoints")
 importFrom("grDevices", "col2rgb")
@@ -27,18 +28,20 @@ importFrom("stats", "delete.response", "lm", "model.frame",
 importFrom("utils", "read.table")
 
 ## S4
-exportClasses(covTS, covMan, covAll, covComp, covQual, covQualNested, covRadial)
+exportClasses(covTS, covMan, covAll, covComp, covQual, covQualNested, covRadial, covOrd)
 
 ## All methods, for own or "foreign" generics:
 exportMethods(
-    npar, kernelName, inputNames, "inputNames<-",  parMap, checkX, 
-    show,
+    npar, kernelName, inputNames, "inputNames<-", parMap, checkX, 
+    hasGrad, 
+    show, plot,
     coef, "coef<-", coefLower, "coefLower<-", coefUpper, "coefUpper<-",
     simulPar,
     covMat, scores, varVec,
     simulate,
     mle, gls,
-    coerce
+    coerce,
+    as.list
 )
 
 export(k1FunExp, k1FunGauss, k1FunPowExp,                  ## related funs
@@ -47,9 +50,9 @@ export(k1FunExp, k1FunGauss, k1FunPowExp,                  ## related funs
        k1Matern3_2, k1Matern5_2,
        kMatern, kGauss,
        covTS, covMan, gp,                                  ## constructors
-       covComp,                                            ## constructors
+       covComp, covOrd,                                    ## constructors
        covQualNested,
-       q1CompSymm, q1Symm, q1Diag,
+       q1CompSymm, q1Symm, q1Diag, q1LowRank,
        npar, kernelName, inputNames,
        parMap, checkX,
        mle,
@@ -58,16 +61,20 @@ export(k1FunExp, k1FunGauss, k1FunPowExp,                  ## related funs
        contr.helmod,
        parNamesSymm,
        parseCovFormula,
-       corLevSymm, corLevCompSymm, corLevDiag,
+       plot.covQual,
+       corLevSymm, corLevCompSymm, corLevDiag, corLevLowRank,
        covRadial,
        k1Fun1Exp, k1Fun1Gauss, k1Fun1Matern3_2, 
        k1Fun1Matern5_2, k1Fun1PowExp,
-       symIndices, optimMethods)
+       k1Fun1Cos,
+       symIndices, optimMethods,
+       warpPower, warpNorm)
 
 S3method(coef, gp)
 S3method(predict, gp)
 S3method(influence, gp)
 S3method(plot, gp)
+S3method(plot, covQual)
 S3method(print, gp)
 S3method(summary, gp)
 S3method(print, summary.gp)

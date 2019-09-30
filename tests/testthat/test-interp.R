@@ -1,3 +1,5 @@
+context("interp")
+
 ## copied from DiceKriging
 branin <- function (x) {
     x1 <- x[1] * 15 - 5

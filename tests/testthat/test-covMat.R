@@ -1,3 +1,5 @@
+context("covMat")
+
 myCov <- covTS(inputs = c("Temp", "Humid", "Press"),
                kernel = "k1PowExp",
                dep = c(range = "cst", shape = "cst"),

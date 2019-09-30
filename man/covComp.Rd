@@ -3,7 +3,7 @@
 \name{covComp}
 \alias{covComp}
 \title{Creator for the Class \code{"covComp"} for Composite Covariance
-Kernels.}
+Kernels}
 \usage{
 covComp(formula, where = .GlobalEnv, topParLower = NULL,
   topParUpper = NULL, trace = 0, ...)

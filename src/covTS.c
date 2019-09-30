@@ -50,7 +50,7 @@ SEXP covMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 		  SEXP index,    // Index for grad.
 		  SEXP rho) {    // An R environment
   
-  int  i, j, k, ell, n, d, p, npar, *iparMap = INTEGER(parMap),  ipoint;
+  int  i, j, k, ell, n, d, p, *iparMap = INTEGER(parMap),  ipoint;
   
   double *rxt = REAL(Xt), *rx1_ell, *rx2_ell, *rCov, 
     *rpar = REAL(par), *rpar_ell;
@@ -72,13 +72,13 @@ SEXP covMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 #endif
 
   /* check the parameters arrays  */
-  npar = LENGTH(par);
   par = coerceVector(par, REALSXP);
   parMap = coerceVector(parMap, INTSXP);  // length npar * d
   PROTECT(dimParMap = getAttrib(parMap, R_DimSymbol));
   p = INTEGER(dimParMap)[0];
 
-#ifdef DEBUG   
+#ifdef DEBUG
+  int npar = LENGTH(par);
   Rprintf("Total number of parameters npar = %d\n", npar);
   Rprintf("Number of the one-dimensional kernel parameters p = %d\n", p);
   Rprintf("Mapping of the parameters\n");
@@ -284,7 +284,7 @@ SEXP covMatMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 		     SEXP index,    // NOT USED
 		     SEXP rho) {    // An R environment
   
-  int  i, j, k, ell, n1, n2, d, p, npar, *iparMap = INTEGER(parMap), ipoint;
+  int  i, j, k, ell, n1, n2, d, p, *iparMap = INTEGER(parMap), ipoint;
   
   double *rx1t = REAL(X1t),  *rx2t = REAL(X2t),
     *rx1_ell, *rx2_ell, *rCov, 
@@ -315,13 +315,13 @@ SEXP covMatMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 #endif
 
   /* check the parameters arrays  */
-  npar = LENGTH(par);
   par = coerceVector(par, REALSXP);
   parMap = coerceVector(parMap, INTSXP);  // length npar * d
   PROTECT(dimParMap = getAttrib(parMap, R_DimSymbol));
   p = INTEGER(dimParMap)[0];
 
-#ifdef DEBUG   
+#ifdef DEBUG
+  int npar = LENGTH(par);
   Rprintf("Total number of parameters npar = %d\n", npar);
   Rprintf("Number of the one-dimensional kernel parameters p = %d\n", p);
   Rprintf("Mapping of the parameters\n");
@@ -427,7 +427,7 @@ SEXP varVec_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 		  SEXP index,    // Index for grad.
 		  SEXP rho) {    // An R environment
   
-  int  i, k, ell, n, d, p, npar, *iparMap = INTEGER(parMap),  ipoint;
+  int  i, k, ell, n, d, p, *iparMap = INTEGER(parMap),  ipoint;
   
   double *rxt = REAL(Xt), *rx1_ell, *rVar, 
     *rpar = REAL(par), *rpar_ell;
@@ -445,7 +445,6 @@ SEXP varVec_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   n = INTEGER(dimXt)[1]; 
 
   /* check the parameters arrays  */
-  npar = LENGTH(par);
   par = coerceVector(par, REALSXP);
   parMap = coerceVector(parMap, INTSXP);  // length npar * d
   PROTECT(dimParMap = getAttrib(parMap, R_DimSymbol));
