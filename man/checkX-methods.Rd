@@ -17,7 +17,7 @@
 
 \usage{
 
-   \S4method{checkX}{covAll}(object, X, strict = FALSE)
+   \S4method{checkX}{covAll}(object, X, strict = FALSE, ...)
 
 }
 

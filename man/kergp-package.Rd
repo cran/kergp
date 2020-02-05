@@ -52,7 +52,7 @@
   "Additive covariance kernels for high-dimensional gaussian process modeling".
   \emph{Annales de la Faculté des Sciences de Toulouse}, 21 (3):
   481-499.
-  \href{http://afst.cedram.org/afst-bin/feuilleter?id=AFST_2012_6_21_3}{link}
+  \href{https://afst.centre-mersenne.org/item/AFST_2012_6_21_3_481_0}{link}
   
   Nicolas Durrande, David Ginsbourger, Olivier Roustant, Laurent Carraro
   (2013).
@@ -65,7 +65,7 @@
   "Argumentwise invariant kernels for the approximation of invariant functions".
   \emph{Annales de la Faculté des Sciences de Toulouse}, 21 (3):
   501-527.
-  \href{http://afst.cedram.org/afst-bin/feuilleter?id=AFST_2012_6_21_3}{link}
+  \href{https://afst.centre-mersenne.org/item/AFST_2012_6_21_3_501_0/}{link}
   
   David Ginsbourger, Nicolas Durrande, Olivier Roustant (2013).
   "Kernels and designs for modelling invariant functions: From group invariance to additivity".

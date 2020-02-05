@@ -197,7 +197,7 @@ Models in S and S-PLUS}, Springer.
 }
 \seealso{
   
-  The \code{\link{corSymm}} correlation structure in the \pkg{nlme}
+  The \code{corSymm} correlation structure in the \pkg{nlme}
   package.
 
 }

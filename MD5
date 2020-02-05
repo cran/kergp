@@ -1,4 +1,4 @@
-848737f72c82d4bedabd342a523fe531 *DESCRIPTION
+761383b2bd2b17e3b40a48825c9cb2c0 *DESCRIPTION
 41f14b722cd6c071540e4fc0be6ed980 *NAMESPACE
 3dc5d55e346ee2b63d4285ba3cc0c22f *R/CovFormulas.R
 e1c5f213fa0885ad131ba141aafb09f1 *R/allGenerics.R
@@ -27,16 +27,16 @@ e801aac60642ef2e755310feb8f7ce4a *R/q1LowRank.R
 8c4ae97fb83868288dac6c8ee1dc5607 *R/simulPar.R
 490d663a00d92252f47ee9f72b97dcf8 *R/simulate_gp.R
 9160fe479216c46ce0332e1bec933102 *R/warpFuns.R
-163d0825ff96028d8a813a98c9f81f95 *build/partial.rdb
-4304b1714cf987b44d26431a691d8f9c *inst/doc/OptimMLE.pdf
-0ca70bc632a09ad03ca1fb77e9d18ccb *inst/doc/beam.pdf
-c54bb732a7c2b98b0987ab0020ddc0cc *inst/doc/groupKernel.pdf
+4755045dcf94a36f8c050098ceee4338 *build/partial.rdb
+2ed27718701fa45ad741cf74c16dfd00 *inst/doc/OptimMLE.pdf
+688e472aa6152b6012c0848c871c586e *inst/doc/beam.pdf
+75253a4f30264199c431b48f7b5c5c92 *inst/doc/groupKernel.pdf
 721c55b902f348b17510952a13374673 *inst/doc/index.html
 633fe5468d2b5009bb66d439f0f3b514 *man/MLE-methods.Rd
 a0299a8db6318d49730b820fa7d2cba1 *man/MLE.Rd
 20e025eed1e036a7cddbd1d9749bbf32 *man/checkGrad.Rd
 599a6e59552fa2a13c452237ff310352 *man/checkPar.Rd
-bf9ae34e3364937b7d7ceeb4a229350c *man/checkX-methods.Rd
+331d65c40252b582de5fce4138f01eb7 *man/checkX-methods.Rd
 dda9aafce4b14ac5dc531cc2db40620f *man/checkX.Rd
 0601126d457f3afa18339b2018cbb36a *man/coef-methods.Rd
 c2d094b8ec91e2cae5e0d4f177687bce *man/coefLower.Rd
@@ -45,7 +45,7 @@ e3e0913a1f8e40227b55e22e825d3226 *man/coefReplace.Rd
 7078c031f986528b0c4017d59d90ba95 *man/corLevCompSymm.Rd
 2843a479e287900bf15cb541e65d7654 *man/corLevDiag.Rd
 f83d57329565b24ebc3a729fd9475da4 *man/corLevLowRank.Rd
-13407a58b98d19e970635d704c414d16 *man/corLevSymm.Rd
+13e64e23a114e03a8cdb4caf926b7a1b *man/corLevSymm.Rd
 f2feb43b3077f7e8baa4080aa6b9e887 *man/covAll-class.Rd
 6d8cc13fd575a69e9f335c2670fc0b78 *man/covComp-class.Rd
 33eca9a27da01bba67679228a5af0028 *man/covComp.Rd
@@ -72,7 +72,7 @@ a865d1c81ddbd46ab891973e90aad965 *man/k1Funs.Rd
 12ddb43e526aa605e75637f129f21b46 *man/k1Kerns.Rd
 889ce5ba3deb2f787e0a052b8538c911 *man/kGauss.Rd
 67880910f17e05a8d4b8230a45b7350e *man/kMatern.Rd
-48f729e2d8d1d02fdebe766be491bf63 *man/kergp-package.Rd
+7d5b110346831c96ff6c00894adce6f1 *man/kergp-package.Rd
 9bf603962d5536b110d90e6321f35265 *man/kernelName.Rd
 b0f74222334f8fcbb4641218fc7c0239 *man/npar-methods.Rd
 17df0d0912a2a1e30400f6d1891d70d7 *man/npar.Rd
@@ -92,7 +92,7 @@ a3768b306cf03ec8a54157e535be6fa6 *man/q1LowRank.Rd
 c36aa43689fc7165f3a5c8a410ddbf37 *man/q1Symm.Rd
 5140ee949d63738554d7805ce97bd841 *man/scores.Rd
 15889ff0cf489c860c5ec2a9a6ddec45 *man/shapeSlot.Rd
-c1af8969e099159f3b7dba118a4c7e26 *man/simulPar-covAll-method.Rd
+071e39a14234e51d09c30495e79b9c56 *man/simulPar-covAll-method.Rd
 6a0939cc7aef88410cd88438d2d53f9b *man/simulPar.Rd
 2e3b10b87ee8681227c4afb16f7464c8 *man/simulate.covAll.Rd
 9d6ee8611a39174be4937cf8a4624b79 *man/simulate.gp.Rd

@@ -27,11 +27,6 @@
     Seed for the random generator.
 
   }
-  \item{...}{
-
-    Other arguments for methods.
-
-  }
 }
 \value{
 
