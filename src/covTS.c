@@ -121,7 +121,8 @@ SEXP covMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
     SEXP dCov, kernValue, dkernValue, attrNm;
     double *rdCov;
     int iindex, ipointGrad;
-
+    PROTECT_INDEX ikern, idkern;
+ 
     iindex = INTEGER(index)[0];
 
 #ifdef DEBUG 
@@ -129,8 +130,8 @@ SEXP covMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 #endif
 
     PROTECT(dCov = allocMatrix(REALSXP, n, n)); //allocate the n x n matrix
-    PROTECT(kernValue = allocVector(REALSXP, 1));
-    PROTECT(dkernValue = allocVector(REALSXP, p));
+    PROTECT_WITH_INDEX(kernValue = allocVector(REALSXP, 1), &ikern);
+    PROTECT_WITH_INDEX(dkernValue = allocVector(REALSXP, p), &idkern);
     
     PROTECT(attrNm = NEW_CHARACTER(1));
     SET_STRING_ELT(attrNm, 0, mkChar("gradient"));
@@ -179,9 +180,9 @@ SEXP covMat_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 	  for (j = i; j < n; j++) {
 	    rx2_ell[0] = rxt[j * d + ell];
 	    SETCADDR(R_fcall, x2_ell);
-	    kernValue = eval(R_fcall, rho);
+	    REPROTECT(kernValue = eval(R_fcall, rho), ikern);
 	    rCov[i + j * n] += REAL(kernValue)[0];
-	    dkernValue = GET_ATTR(kernValue, attrNm);
+	    REPROTECT(dkernValue = GET_ATTR(kernValue, attrNm), idkern);
 	    rdCov[i + j * n] += REAL(dkernValue)[ipointGrad];
 	    //  Rprintf("  grad = %8.6f\n", REAL(dkernValue)[ipointGrad]);
 	  }
@@ -473,12 +474,13 @@ SEXP varVec_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
     SEXP dVar, kernValue, dkernValue, attrNm;
     double *rdVar;
     int iindex, ipointGrad;
-
+    PROTECT_INDEX ikern, idkern;
+    
     iindex = INTEGER(index)[0];
     
     PROTECT(dVar = allocMatrix(REALSXP, n, 1)); //allocate the n x 1 matrix
-    PROTECT(kernValue = allocVector(REALSXP, 1));
-    PROTECT(dkernValue = allocVector(REALSXP, p));
+    PROTECT_WITH_INDEX(kernValue = allocVector(REALSXP, 1), &ikern);
+    PROTECT_WITH_INDEX(dkernValue = allocVector(REALSXP, p), &idkern);
     
     PROTECT(attrNm = NEW_CHARACTER(1));
     SET_STRING_ELT(attrNm, 0, mkChar("gradient"));
@@ -510,9 +512,9 @@ SEXP varVec_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 	  rx1_ell[0] = rxt[i * d + ell];
 	  SETCADR(R_fcall, x1_ell);
 	  SETCADDR(R_fcall, x1_ell);
-	  kernValue = eval(R_fcall, rho);
+	  REPROTECT(kernValue = eval(R_fcall, rho), ikern);
 	  rVar[i] += REAL(kernValue)[0];
-	  dkernValue = GET_ATTR(kernValue, attrNm);
+	  REPROTECT(dkernValue = GET_ATTR(kernValue, attrNm), idkern);
 	  rdVar[i] += REAL(dkernValue)[ipointGrad];
 
 	}

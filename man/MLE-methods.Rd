@@ -209,29 +209,30 @@
 
     \item When \code{optimFun} is \code{nloptr:nloptr}, it is assumed
     that we are minimizing the negative log-likelihood \eqn{- \log
-    L}{-log L}. Note that both predefined methods \code{"NLOPT_LD_LBFGS"} 
-    and \code{"NLOPT_LN_COBYLA"} can cope with a non-finite value
-    of the objective, except for the initial value of the parameter.
-    Non-finite values of \eqn{- \log L}{-log L} are often met in
-    practice during optimization steps. The method
+    L}{-log L}. Note that both predefined methods
+    \code{"NLOPT_LD_LBFGS"} and \code{"NLOPT_LN_COBYLA"} can cope with a
+    non-finite value of the objective, except for the initial value of
+    the parameter.  Non-finite values of \eqn{- \log L}{-log L} are
+    often met in practice during optimization steps. The method
     \code{"NLOPT_LD_LBFGS"} used when \code{compGrad} is \code{TRUE}
     requires that the gradient is provided by/with the covariance
     object. You can try other values of \code{optimMethod} corresponding
     to the possible choice of the \code{"algorithm"} element in the
-    \code{opts} argument of \code{nloptr:nloptr}. It may be useful
-    to give other options in order to control the optimization and its
+    \code{opts} argument of \code{nloptr:nloptr}. It may be useful to
+    give other options in order to control the optimization and its
     stopping rule.
 
     \item When \code{optimFun} is \code{"stats:optim"}, it is assumed
-    that we are maximizing the log-likelihood \eqn{\log L}{log L}. 
-    We suggest to use one of the methods \code{"L-BFGS-B"} or \code{"BFGS"}. 
-    Notice that \code{control} can be provided in \code{\dots}, but 
-    \code{control$fnscale} is forced to be \code{- 1}, corresponding to maximization. 
-    Note that \code{"L-BFGS-B"} uses box constraints, but the optimization stops
-    as soon as the log-likelihood is non-finite or \code{NA}. The method
-    \code{"BFGS"} does not use constraints but allows the log-likelihood
-    to be non-finite or \code{NA}. Both methods can be used without
-    gradient or with gradient if \code{object} allows this.
+    that we are maximizing the log-likelihood \eqn{\log L}{log L}.  We
+    suggest to use one of the methods \code{"L-BFGS-B"} or
+    \code{"BFGS"}.  Notice that \code{control} can be provided in
+    \code{\dots}, but \code{control$fnscale} is forced to be \code{- 1},
+    corresponding to maximization.  Note that \code{"L-BFGS-B"} uses box
+    constraints, but the optimization stops as soon as the
+    log-likelihood is non-finite or \code{NA}. The method \code{"BFGS"}
+    does not use constraints but allows the log-likelihood to be
+    non-finite or \code{NA}. Both methods can be used without gradient
+    or with gradient if \code{object} allows this.
 
   }
   

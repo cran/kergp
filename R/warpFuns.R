@@ -1,13 +1,11 @@
 warpSpline2 <- list(
-  fun = function(z, par, L = 2) {
-    if (length(par) != L) stop("'par' must be of length ", L)
-    xknots <- seq(from = 0, to = 1, length.out = L)
-    if (!requireNamespace("DiceKriging", quietly = TRUE)) {
-      stop("DiceKriging required")
-    }
-    y <- DiceKriging::scalingFun1d(z, knots = xknots, eta = par)
-    attr(y, "gradient") <- DiceKriging:::scalingGrad1d(z, knots = xknots)
-    return(y)
+  fun = function(z, par, L = 2, knots) {
+  if (!requireNamespace("DiceKriging", quietly = TRUE)) {
+    stop("DiceKriging required")
+  }
+  y <- DiceKriging::scalingFun1d(z, knots = knots, eta = par)
+  attr(y, "gradient") <- DiceKriging:::scalingGrad1d(z, knots = knots)
+  return(y)
   },
   parNames = paste("eta"),
   parDefault = c("eta" = 1),
@@ -18,12 +16,10 @@ warpSpline2 <- list(
 )
 
 warpSpline1 <- list(
-  fun = function(z, par, L = 2) {
-    if (length(par) != (L-1)) stop("'par' must be of length ", L-1)
-    xknots <- seq(from = 0, to = 1, length.out = L)
+  fun = function(z, par, L = 2, knots) {
     yknots <- c(0, cumsum(par))
-    y <- approx(x = xknots, y = yknots, xout = z)$y
-    attr(y, "gradient") <- outer(z, xknots[-1], function(z, t){z >= t}) * 1
+    y <- approx(x = knots, y = yknots, xout = z)$y
+    attr(y, "gradient") <- outer(z, knots[-1], function(z, t){z >= t}) * 1
     return(y)
   },
   parNames = paste("eta"),
@@ -35,7 +31,7 @@ warpSpline1 <- list(
 )
 
 warpPower <- list(
-  fun = function(z, par, L) {
+  fun = function(z, par, L, knots = NULL) {
     y <- pbeta(q = z, shape1 = par[1], shape2 = 1)
     ind <- (z > 0) & (z < 1)
     grad <- rep(0, length(z))
@@ -53,7 +49,7 @@ warpPower <- list(
 
 eps <- 1e-10
 warpNorm <- list(
-  fun = function(z, par, L) {
+  fun = function(z, par, L, knots = NULL) {
     Az <- pnorm(z, mean = par[1], sd = par[2])
     A1 <- pnorm(1, mean = par[1], sd = par[2])
     A0 <- pnorm(0, mean = par[1], sd = par[2])
@@ -83,7 +79,7 @@ warpNorm <- list(
 )
 
 warpUnorm <- list(
-  fun = function(z, par, L) {
+  fun = function(z, par, L, knots = NULL) {
     y <- pnorm(z, mean = par[1], sd = par[2])
     grad <- matrix(0, nrow = length(z), ncol = 2)
     colnames(grad) <- c("mean", "sd")

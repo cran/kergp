@@ -28,7 +28,8 @@ importFrom("stats", "delete.response", "lm", "model.frame",
 importFrom("utils", "read.table")
 
 ## S4
-exportClasses(covTS, covMan, covAll, covComp, covQual, covQualNested, covRadial, covOrd)
+exportClasses(covTS, covMan, covAll, covComp, covQual, covQualNested, covRadial,
+              covOrd, covTP, covANOVA)
 
 ## All methods, for own or "foreign" generics:
 exportMethods(
@@ -60,7 +61,7 @@ export(k1FunExp, k1FunGauss, k1FunPowExp,                  ## related funs
        checkGrad, checkPar,
        contr.helmod,
        parNamesSymm,
-       parseCovFormula,
+       parseCovFormula, 
        plot.covQual,
        corLevSymm, corLevCompSymm, corLevDiag, corLevLowRank,
        covRadial,
@@ -68,7 +69,8 @@ export(k1FunExp, k1FunGauss, k1FunPowExp,                  ## related funs
        k1Fun1Matern5_2, k1Fun1PowExp,
        k1Fun1Cos,
        symIndices, optimMethods,
-       warpPower, warpNorm)
+       warpPower, warpNorm,
+       covTP, covANOVA)
 
 S3method(coef, gp)
 S3method(predict, gp)

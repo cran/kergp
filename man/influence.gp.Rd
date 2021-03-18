@@ -86,7 +86,7 @@
   hyper-parameters of Gaussian processes with model
   misspecification". \emph{Computational Statistics and Data Analysis},
   \bold{66}, 55-69
-  \href{http://www.sciencedirect.com/science/article/pii/S0167947313001187}{link}
+  \href{https://www.sciencedirect.com/science/article/pii/S0167947313001187}{link}
   %% \url{http://www.lpma.math.upmc.fr/pageperso/bachoc/publications.html}
   
   N.A.C. Cressie (1993), \emph{Statistics for spatial data}. Wiley series

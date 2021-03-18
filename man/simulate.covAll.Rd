@@ -1,14 +1,10 @@
 \name{simulate, covAll-method}
 \alias{simulate,covAll-method}
-\title{
-
-  Simulation of a \code{covAll} Object
-
-}
+\title{Simulation of a \code{covAll} Object}
 \description{
-  
-    Simulation of a \code{covAll} object.
-  
+
+  Simulation of a \code{covAll} object.
+
 }
 \usage{
 

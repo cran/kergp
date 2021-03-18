@@ -1,16 +1,23 @@
 \name{warpNorm}
 \alias{warpNorm}
 \alias{warpPower}
+\alias{warpUnorm}
+\alias{warpSpline1}
+\alias{warpSpline2}
+\alias{warpFun}
 %\docType{data}
 \title{
-Warpings for ordinal inputs
+Warpings for Ordinal Inputs
 }
 \description{
 Given warpings for ordinal inputs.
 }
 \usage{
 warpNorm
+warpUnorm
 warpPower
+warpSpline1
+warpSpline2
 }
 \format{
   The format is a list of 6:
@@ -49,5 +56,11 @@ warpPower
 
   }
   
-
+  Furthermore, a warping corresponding to unnormalized Normal cdf is implemented, 
+  as well as spline warpings of degree 1 and 2. 
+  Splines are defined by a sequence of \code{k} knots between 0 and 1. The first knot is 0, and the last is 1.
+  A spline warping of degree 1 is a continuous piecewise linear function. 
+  It is parameterized by a positive vector of length \code{k-1}, representing the increments at knots.
+  A spline warping of degree 2 is a non-decreasing quadratic spline. It is obtained by integrating a spline of degree 1.
+  Its parameters form a positive vector of length \code{k}, representing the derivatives at knots. The implementation relies on the function \code{scalingFun1d} of \code{DiceKriging} package.
 }

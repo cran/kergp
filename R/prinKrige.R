@@ -99,7 +99,7 @@ prinKrige <- function(object) {
     B <- t(backsolve(t(object$L), B))
     B <- backsolve(t(object$L), B)
 
-    eB <- eigen(B)
+    eB <- eigen(B, symmetric = TRUE)
     e <- rev(eB$values)
     U <- eB$vectors[ , rev(1:n)]
     list(values = e, vectors = U, EBM = B)

@@ -172,60 +172,91 @@ symIndices <- function(n, diag = FALSE) {
 
 }
 
-## ****************************************************************************
+
+
+# ****************************************************************************
 ##' Optimization methods (or algorithms) for the \code{mle} method.
 ##'
 ##' @title Optimization Methods (or Algorithms) for the \code{mle}
 ##' Method
 ##'
+##' @param optimMethod A character string used to find a method in a
+##' possible approximated fashion, see \bold{Examples}.
+##' 
 ##' @param optimFun Value of the corresponding formal argument of the
 ##' \code{mle} method, or \code{"both"}. In the later case the full
 ##' list of algorithms will be obtained.
 ##'
-##' @return A data frame with two columns: \code{optimFun} and
-##' \code{optimMethod}.
+##' @return A data frame with four character columns: \code{optimFun},
+##' \code{optimMethod}, \code{globLoc} and \code{derNo}. The column
+##' \code{globLoc} indicate whether the method is global (\code{"G"})
+##' or local (\code{"L"}). The column \code{derNo} indicates whether
+##' the method uses derivatives (\code{D}) or not (\code{"N"}) or
+##' \emph{possibly} uses it (\code{"P"}). Only methods corresponding
+##' the \code{optimFun = "stats::optim"} can have the value \code{"P"}
+##' for \code{derNo}. The data frame can be zero-row if
+##' \code{optimMethod} is given and no method match.
 ##'
+##' @section Caution: The optimization method given in the argument
+##' \code{optimMethod} of the \code{mle} method should be compliant
+##' with the \code{compGrad} argument. Only a small number of
+##' possibilities have been tested, including the default values.
+##' 
 ##' @references 
 ##' See \href{https://nlopt.readthedocs.io/en/latest/}{The NLopt website}.
 ##'
 ##' @seealso
 ##'
-##' \code{\link{mle-methods}}.
+##' \code{\link{mle-methods}}, \code{\link[stats]{optim}},
+##' \code{\link[nloptr]{nloptr}}.
 ##' 
 ##' @examples
 ##' optimMethods()
-##' 
-optimMethods <- function(optimFun = c("both", "nloptr::nloptr",
+##' optimMethods(optimMethod = "cobyla")
+##' optimMethods(optimMethod = "nelder")
+##' optimMethods(optimMethod = "BFGS")
+##' optimMethods("CMAES")
+optimMethods <- function(optimMethod = NULL,
+                         optimFun = c("both", "nloptr::nloptr",
                              "stats::optim")) {
-
+    
     name <- NULL ## to avoid NOTE at check
     optimFun <- match.arg(optimFun) 
-    
+
     if (optimFun != "nloptr::nloptr") {
-        oM <- eval(formals(optim)$method)
+        oMO <- eval(formals(optim)$method)
+        globLocO <- rep("L", length(oMO))
+        derNoO <- rep("N", length(oMO))
+        names(globLocO) <- names(derNoO) <- oMO
+        globLocO["SANN"] <- "G"
+        derNoO[c("BFGS", "L-BFGS-B", "CG")] <- "P"
     } else {
-        oM <- character(0)
+        oMO <- globLocO <- derNoO <- character(0)
     }
     
     if (optimFun != "stats::optim") { 
         nO <- nloptr.get.default.options()
-        npV <- subset(nO, name == "algorithm")$possible_values
-        npV <- strsplit(npV, ", ")[[1]]
-        ## Global/Local and No derivative/Derivative Add this a
-        ## columns?
-        ## L <- strsplit(npV, "_")
-        ## GLND <- sapply(L, function(x) x[2])
-        ## GL <- substr(GLND, start = 1, stop = 1)
-        ## ND <- substr(GLND, start = 2, stop = 2)
+        oMN <- subset(nO, name == "algorithm")$possible_values
+        oMN <- strsplit(oMN, ", ")[[1]]
+        GLND <- regmatches(oMN, regexpr("[LG][DN]", oMN))
+        globLocN <- substr(GLND, start = 1, stop = 1)
+        derNoN <- substr(GLND, start = 2, stop = 2)
     } else {
-        npV <- character(0)
+        oMN <- globLocN <- derNoN <- character(0)
     }
-        
-    df <- data.frame(optimFun = c(rep("stats::optim", length(oM)),
-                         rep("nloptr::nloptr", length(npV))),
-                     optimMethod = c(oM, npV),
+    
+    df <- data.frame(optimFun = c(rep("stats::optim", length(oMO)),
+                         rep("nloptr::nloptr", length(oMN))),
+                     optimMethod = c(oMO, oMN),
+                     globLoc = c(globLocO, globLocN),
+                     derNo = c(derNoO, derNoN),
                      stringsAsFactors = FALSE)
 
+    if (!is.null(optimMethod)) {
+        ind <- grep(tolower(optimMethod), tolower(df$optimMethod))
+        df <- df[ind, ]
+    }
+    
     df
 }
 
@@ -302,5 +333,28 @@ parseGroupList <- function(groupList, prefix = "gr", sep = "/") {
          nestedLevels = nestedLevels,
          levels = flat)
 
+}
+
+## ============================================================================
+## utility functions to use 'numDeriv'
+## ============================================================================
+
+covAsVec <- function(par, object, X) {
+    coef(object) <- par
+    C <- covMat(object = object, X = X, compGrad = TRUE)
+    grad <- attr(C, "gradient")
+    C <- as.vector(C)
+    dim(grad) <- c(length(C), length(par))
+    attr(C, "gradient") <- grad
+    C
+}
+covAsVec2 <- function(xNew, object, X) {
+    C <- covMat(object = object, X = X, Xnew = xNew, 
+                deriv = TRUE)
+    der <- attr(C, "der")
+    C <- as.vector(C)
+    dim(der) <- c(length(C), object@d)
+    attr(C, "der") <- der
+    C
 }
 

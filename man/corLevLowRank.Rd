@@ -131,7 +131,7 @@ corLevLowRank(par, nlevels, rank, levels,
 }
 \seealso{
 
-  The \code{\link{q1LowRank}} creator of a correponding kernel object
+  The \code{\link{q1LowRank}} creator of a corresponding kernel object
   with class \code{"covQual"}, and the similar \code{\link{corLevSymm}}
   function for the full-rank case.
 

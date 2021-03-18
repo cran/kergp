@@ -115,6 +115,7 @@ simulate.gp <- function(object, nsim = 1L, seed = NULL,
                         cond = TRUE,
                         trendKnown = FALSE,
                         newVarNoise = NULL,
+                        nuggetSim = 1e-8,
                         checkNames = TRUE,
                         output = c("list", "matrix"),
                         label = "y", unit = "",
@@ -123,16 +124,22 @@ simulate.gp <- function(object, nsim = 1L, seed = NULL,
     mc <- match.call()
     output <- match.arg(output)
     noise <- object$noise
-    
+
+    ## This avoids problems for conditional simulation because
+    ## a noisy 'gp' can have varNoise = 0.0 
+    if (noise && object$varNoise == 0.0) noise <- FALSE
+
+    newNoise <- FALSE
     if (is.null(newVarNoise)) {
         if (noise) {
             newVarNoise <- object$varNoise
-        } 
+            newNoise <- TRUE
+        }
     } else {
         if (newVarNoise < 0.0) stop("'varNoise' must be >= 0.0")
-        noise <- (newVarNoise > 0.0) 
+        newNoise <- (newVarNoise > 0.0) 
     }
-   
+    
     N <- nsim
     
     n <- nrow(object$F)
@@ -173,104 +180,166 @@ simulate.gp <- function(object, nsim = 1L, seed = NULL,
                                seed = seed,
                                X = XNew, checkNames = checkNames, ...)
         
-        yNewSim <- trendNewSim + zetaNewSim
-
-        ## add noise if needed
-        if (noise) {
-            yNewSim <- yNewSim + sqrt(newVarNoise) *
-                array(rnorm(nNew * N), dim = c(nNew, N)) 
-        }
-        
-        if (output == "list") {
-            yNewSim <- list(X = object$X, F = object$F, y = object$y,
-                            XNew = XNew, FNew = FNew,
-                            sim = yNewSim,
-                            trend = trendNewSim,
-                            trendKnown = trendKnown,
-                            noise = noise,
-                            newVarNoise = newVarNoise,
-                            label = label,
-                            unit = unit,
-                            Call = mc)
-            class(yNewSim) <- "simulate.gp"
-            return(yNewSim)   
-        } else {
-            attr(yNewSim, "trendKnown") <- trendKnown
-            return(yNewSim)
-        }
-   
-    }
-    
-    ##===========================================================================
-    ## compute 'KCond' and its Cholesky root as needed in step 2. 'K'
-    ## could be retreived from its Cholesky root?
-    ##=========================================================================== 
-    K <- covMat(object$covariance, X = object$X, checkNames = checkNames,
-                compGrad = FALSE)
-    KStar <- forwardsolve(object$L, K)
-    KCond <- K - crossprod(KStar)
-    LCond <- t(chol(KCond))
-
-    if (!trendKnown) {
-    
-        ##=======================================================================
-        ## STEP 1 simulate 'beta - betaHat'.  'dBetaSim' is a matrix
-        ## with random (betaSim - betaHat) as its columns
-        ## ======================================================================
-        Znorm <- array(rnorm(p * N), dim = c(p, N))
-        dBetaSim <- backsolve(object$RStar, Znorm)
-        trendNewSim <-  FNew %*% sweep(x = dBetaSim, MARGIN = 1,
-                                       STATS = object$betaHat, FUN = "+")
-        
-        ##=======================================================================
-        ## STEP 2 simulate 'zeta' conditional on 'beta' and 'y'
-        ##=======================================================================
-    
-        ## 'dBetaSim' -> the 2nd part of L^{-1} [y - F betaSim]
-        E <- -object$FStar %*% dBetaSim
-        
-        ## add the 1st part of L^{-1} [y - F betaSim], i.e.  'eStar'
-        E <- sweep(x = E, MARGIN = 1, STATS = object$eStar, FUN = "+")
-    
-        ## left mutliply by t(KStar) = K %*% L^{-T}
-        E <- t(KStar) %*% E
-        
-        ## now, find the 'zetaSim' conditional on 'y' and 'betaSim' 
-        ZSim <- array(rnorm(n * N), dim = c(n, N))
-        ZSim <- E + LCond %*% ZSim
-        
+        yNewSim <- trendNewSim + zetaNewSim   
+      
     } else {
-        trend <- FNew %*% object$betaHat
-        trendNewSim <-  array(trend, dim = c(nNew, N))
-        ## now, find the 'zetaSim' conditional of 'y' with 'beta' fixed
-        ZSim <- array(rnorm(n * N), dim = c(n, N))
-        ZSim <- LCond %*% ZSim
-        eStarMod <- t(KStar) %*% object$eStar
-        ZSim <- sweep(x = ZSim, MARGIN = 1, STATS = eStarMod, FUN = "+")
-    }
-    
-    ##=======================================================================
-    ## STEP 3: now krige the N columns to find 'ZNewSim'
-    ##=======================================================================
-    
-    kNew <- covMat(object$covariance, X = object$X, Xnew = XNew, compGrad = FALSE)
-    KNew <- covMat(object$covariance, X = XNew, Xnew = XNew, compGrad = FALSE)
-    kNewStar <- forwardsolve(object$L, kNew)
-    
-    KNewCond <- KNew - crossprod(kNewStar)
-    LNewCond <- t(chol(KNewCond))
-    
-    ZNewSim <- array(rnorm(nNew * N), dim = c(nNew, N))
-    ZNewSim <- LNewCond %*% ZNewSim
-    ZNewSim <- ZNewSim + t(kNewStar) %*% forwardsolve(object$L, ZSim)
+        
+        smallNoise <- (object$varNoise < 1e-10)
+        
+        ##======================================================================
+        ## compute matrices that will be required in any conditional simulation
+        ## =====================================================================
+        
+        kNew <- covMat(object$covariance, X = object$X, Xnew = XNew,
+                       compGrad = FALSE)
+        KNew <- covMat(object$covariance, X = XNew, Xnew = XNew,
+                       compGrad = FALSE)
+        kNewStar <- forwardsolve(object$L, kNew)
 
-    yNewSim <- trendNewSim + ZNewSim
-    
-    if (noise) {
+        KNewCond <- KNew - crossprod(kNewStar)
+        diag(KNewCond) <- diag(KNewCond) + nuggetSim
+        LNewCond <- t(chol(KNewCond))
+        
+            
+        if (noise) {
+
+            smallNoise <- (object$varNoise < 1e-8)
+            
+            ##===================================================================
+            ## compute 'KCond' and its Cholesky root as needed in step 2. 'K'
+            ## could be retreived from its Cholesky root?
+            ## 
+            ## Note that 'KCond' would be zero in the non-noisy case
+            ## so two cases are needed. When 'object' embdeds a small
+            ## variance noise, computing the Cholesky of 'KCond' is
+            ## hazardous, and but then 'KCond' is close to 'object$varNoise'
+            ## times the identity matrix.
+            ## 
+            ## Many Thanks to Julien Pelamatti for signaling this issue!
+            ## ===================================================================
+        
+            K <- covMat(object$covariance, X = object$X, checkNames = checkNames,
+                        compGrad = FALSE)
+            KStar <- forwardsolve(object$L, K)
+            
+            if (!smallNoise) {
+                KCond <- K - crossprod(KStar)
+                diag(KCond) <- diag(KCond) + nuggetSim
+                LCond <- t(chol(KCond))
+            }
+            
+            if (!trendKnown) {
+                
+                ##===============================================================
+                ## STEP 1 simulate 'beta - betaHat'.  'dBetaSim' is a matrix
+                ## with random (betaSim - betaHat) as its columns
+                ## ==============================================================
+                
+                Znorm <- array(rnorm(p * N), dim = c(p, N))
+                dBetaSim <- backsolve(object$RStar, Znorm)
+                trendNewSim <-  FNew %*% sweep(x = dBetaSim, MARGIN = 1,
+                                               STATS = object$betaHat, FUN = "+")
+                
+                ##===============================================================
+                ## STEP 2 simulate 'zeta' conditional on 'beta' and 'y'
+                ##================================================================
+                
+                ## 'dBetaSim' -> the 2nd part of L^{-1} [y - F betaSim]
+                E <- -object$FStar %*% dBetaSim
+                
+                ## add the 1st part of L^{-1} [y - F betaSim], i.e.  'eStar'
+                E <- sweep(x = E, MARGIN = 1, STATS = object$eStar, FUN = "+")
+                
+                ## left mutliply by t(KStar) = K %*% L^{-T}
+                E <- t(KStar) %*% E
+                
+                ## now, find the 'zetaSim' conditional on 'y' and 'betaSim' 
+                ZSim <- array(rnorm(n * N), dim = c(n, N))
+                if (smallNoise) {
+                    ZSim <- E + sqrt(object$varNoise) * ZSim
+                } else {
+                    ZSim <- E + LCond %*% ZSim
+                }
+            } else {
+                
+                trend <- FNew %*% object$betaHat
+                trendNewSim <-  array(trend, dim = c(nNew, N))
+                ## now, find the 'zetaSim' conditional of 'y' with 'beta' fixed
+                ZSim <- array(rnorm(n * N), dim = c(n, N))
+                if (smallNoise) {
+                    ZSim <- sqrt(object$varNoise) * ZSim
+                } else {   
+                    ZSim <- LCond %*% ZSim
+                }
+                eStarMod <- t(KStar) %*% object$eStar
+                ZSim <- sweep(x = ZSim, MARGIN = 1, STATS = eStarMod, FUN = "+")
+                
+            }
+            
+            ##===============================================================
+            ## STEP 3: now krige the N columns to find 'ZNewSim'
+            ##===============================================================
+            
+            ZNewSim <- array(rnorm(nNew * N), dim = c(nNew, N))
+            ZNewSim <- LNewCond %*% ZNewSim
+            ZNewSim <- ZNewSim + t(kNewStar) %*% forwardsolve(object$L, ZSim)
+            
+            yNewSim <- trendNewSim + ZNewSim
+            
+            
+        } else {
+            
+            if (!trendKnown) {
+                
+                ## ============================================================
+                ## In this case both the "new" trend and the kriging mean vary
+                ## across paths.
+                ## =============================================================
+
+                Znorm <- array(rnorm(p * N), dim = c(p, N))
+                BetaSim <- backsolve(object$RStar, Znorm)
+                BetaSim <- sweep(x = BetaSim, MARGIN = 1, STATS = object$betaHat,
+                                 FUN = "+")
+                
+                trendSim <- object$F %*% BetaSim
+                ZSim <- sweep(x = -trendSim, MARGIN = 1, STATS = object$y,
+                              FUN = "+")
+                
+                trendNewSim <-  FNew %*% BetaSim
+                
+                ZNewSim <- array(rnorm(nNew * N), dim = c(nNew, N))
+                ZNewSim <- LNewCond %*% ZNewSim
+                ZNewSim <- ZNewSim + t(kNewStar) %*% forwardsolve(object$L, ZSim)
+                
+                yNewSim <- trendNewSim + ZNewSim
+                
+            }  else {
+                
+                ## ============================================================
+                ## In this case both the "new" trend and the kriging
+                ## mean are constant across paths. Note that the kriging mean
+                ## is no longer included in 'ZNewSim'
+                ## =============================================================
+        
+                trendNew <-  FNew %*% object$betaHat
+                trendNewSim <- array(trendNew, dim = c(nNew, N))          
+                shift <- trendNew + t(kNewStar) %*% object$eStar
+                
+                ZNewSim <- array(rnorm(nNew * N), dim = c(nNew, N))
+                ZNewSim <- LNewCond %*% ZNewSim
+                
+                yNewSim <- sweep(ZNewSim, MARGIN = 1, STATS = shift, FUN = "+")
+                
+            }
+            
+        }
+    }   
+
+    if (newNoise) {
         yNewSim <- yNewSim + sqrt(newVarNoise) *
             array(rnorm(nNew * N), dim = c(nNew, N)) 
     }
-        
+    
     if (output == "list") {
         yNewSim <- list(X = object$X, F = object$F, y = object$y,
                         XNew = XNew, FNew = FNew,
@@ -288,8 +357,9 @@ simulate.gp <- function(object, nsim = 1L, seed = NULL,
         attr(yNewSim, "trendKnown") <- trendKnown
         return(yNewSim)
     }
-        
+    
 }
+    
 ##' Function to plot simulations form a \code{gp} object.
 ##'
 ##' @title  Function to plot simulations form a \code{gp} object

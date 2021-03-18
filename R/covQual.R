@@ -458,12 +458,12 @@ plot.covQual <- function(x, type = c("cov", "cor", "warping"), ...){
     }
     parWarp <- coef(x)[1:x@parNwarp]
     zseq <- seq(0, 1, length.out = 200)
-    yseq <- x@warpFun$fun(zseq, par = parWarp, L = x@nlevels)
+    yseq <- x@warpFun$fun(zseq, par = parWarp, L = x@nlevels, knots = x@warpKnots)
     plot(zseq, yseq, type = "l", xaxt = "n", 
          xlab = inputNames(x), ylab = "", ...)
     levseq <- seq(0, 1, length.out = x@nlevels)
     axis(side = 1, at = levseq, labels = x@levels[[1]])
-    points(levseq, x@warpFun$fun(levseq, par = parWarp, L = x@nlevels), pch = 19)
+    points(levseq, x@warpFun$fun(levseq, par = parWarp, L = x@nlevels, knots = x@warpKnots), pch = 19)
     if (x@parNk1 > 0) lines(c(0, 1), c(0, 1), lty = "dotted")  # in that case, F is normalized
   }
 }

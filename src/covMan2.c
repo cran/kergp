@@ -37,6 +37,8 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   
   SEXP dimXt, R_fcall, x1, x2,
     kernValue, dkernValue,  attrNm, scores;
+
+  PROTECT_INDEX ikern, idkern;
   
   if (!isFunction(fun)) error("'fun' must be a function");
   if (!isMatrix(Xt)) error("'Xt' must be a matrix");
@@ -88,7 +90,10 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   for (ipar = 0; ipar < npar; ipar++) {
     rscores[ipar] = 0.0;
   }
- 
+
+  PROTECT_WITH_INDEX(kernValue = allocVector(REALSXP, 1), &ikern);
+  PROTECT_WITH_INDEX(dkernValue = allocVector(REALSXP, npar), &idkern);
+  
   ij = 0;
   
   for (i = 0; i < n; i++) { 
@@ -104,14 +109,9 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 	rx2[k] = rxt[j*d + k]; 
       }
       SETCADDR(R_fcall, x2);
-      kernValue = eval(R_fcall, rho);
-      // Rprintf("Kernel value = %7.3f\n", REAL(kernValue)[0]);
-      dkernValue = GET_ATTR(kernValue, attrNm);
-      // for (ipar = 0; ipar < npar; ipar++) {
-      // Rprintf("%d dK = %7.3f\n", ipar, REAL(dkernValue)[ipar]);
-      //}
-      //Rprintf("Kernel value = %7.3f\n", REAL(kernValue)[1]);
-      // update the scores
+      REPROTECT(kernValue = eval(R_fcall, rho), ikern);
+      REPROTECT(dkernValue = GET_ATTR(kernValue, attrNm), idkern);
+     
       for (ipar = 0; ipar < npar; ipar++) {
 	rscores[ipar] += rweights[ij] * REAL(dkernValue)[ipar];
       }
@@ -119,7 +119,7 @@ SEXP scores_covMan(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
     }
   }
 
-  UNPROTECT(9);
+  UNPROTECT(11);
   return(scores);
 
 }

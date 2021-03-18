@@ -252,7 +252,9 @@ setMethod("coef<-",
 setMethod("coefLower", 
           signature = signature(object = "covMan"),
           definition = function(object){
-            object@parLower            
+              res <- object@parLower
+              names(res) <- object@kernParNames
+              res  
           })
 
 setMethod("coefLower<-",
@@ -268,7 +270,9 @@ setMethod("coefLower<-",
 setMethod("coefUpper", 
           signature = signature(object = "covMan"),
           definition = function(object){
-            object@parUpper            
+              res <- object@parUpper
+              names(res) <- object@kernParNames
+              res            
           })
 
 setMethod("coefUpper<-",

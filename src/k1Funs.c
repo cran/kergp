@@ -60,9 +60,10 @@ SEXP k1FunExpC(SEXP x) {   /* x = site                                       */
     rvalue[i] = emz;
     if (z < EPSILON) {
       rder[i] = 0.0;
-      rder[n + i] = 0.0;
+      rder[n + i] = NA_REAL;
     } else {
-      rder[i] = -emz;
+      if (rx[i] > EPSILON) rder[i] = -emz;
+      else rder[i] = emz;
       rder[n + i] = emz;
     }
   }
@@ -99,7 +100,8 @@ SEXP k1FunMatern3_2C(SEXP x) {   /* x = site                                    
     z = SQR3 * fabs(rx[i]);
     emz = exp(-z);
     rvalue[i] = (1.0 + z) * emz;
-    rder[i] = -SQR3 * z* emz;
+    if (rx[i] > 0.0) rder[i] = -SQR3 * z* emz;
+    else rder[i] = SQR3 * z* emz;
     rder[n + i] = 3.0 * (-1.0 + z) * emz;
   }
   
@@ -134,8 +136,9 @@ SEXP k1FunMatern5_2C(SEXP x) {   /* x = site                                    
     z = SQR5 * fabs(rx[i]);
     emz = exp(-z);
     rvalue[i] = (1.0 + z * ( 1.0 + z / 3.0) ) * emz;
-    rder[i] = -SQR5 * z * (1.0 + z) *  emz / 3.0;
-    rder[n + i] = -SQR5 * (1.0 + z * (1.0 - z)) * emz / 3.0;
+    if (rx[i] > 0.0) rder[i] = -SQR5 * z * (1.0 + z) *  emz / 3.0;
+    else rder[i] = SQR5 * z * (1.0 + z) *  emz / 3.0;
+    rder[n + i] = -5.0 * (1.0 + z * (1.0 - z)) * emz / 3.0;
   }
   
   PROTECT(attrNm = NEW_CHARACTER(1));

@@ -1,15 +1,13 @@
 \name{simulate.gp}
 \alias{simulate.gp}
-\title{
-
-  Simulation of Paths from a \code{gp} Object
-}
+\title{Simulation of Paths from a \code{gp} Object}
 \usage{
 \method{simulate}{gp}(object, nsim = 1L, seed = NULL,
          newdata = NULL,
          cond = TRUE,
          trendKnown = FALSE,
          newVarNoise = NULL,
+         nuggetSim = 1e-8,
          checkNames = TRUE,
          output = c("list", "matrix"),
          label = "y", unit = "",
@@ -63,6 +61,11 @@
     be regarded as a confidence interval rather than a prediction
     interval.
     
+  }
+  \item{nuggetSim}{
+  
+    Small positive number ("nugget") added to the diagonal of conditional covariance matrices before computing a Cholesky decomposition, for numerical lack of positive-definiteness.
+This may happen when the covariance kernel is not (either theoretically or numerically) positive definite.
   }
   \item{checkNames}{
     

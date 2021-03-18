@@ -196,9 +196,10 @@ parseCovFormula <- function(formula, where = .GlobalEnv,
     
     ## differentiate w.r.t. kernel parameters
     for (kn in kernNames) {
-        s <- deparse(D(toDer, kn))
+        s <- deparse(D(toDer, kn), width.cutoff = 500L)
         pn <- paste(kn, obj@kernParNames, sep = ".")
         for (ppn in parNamesList[[kn]]) {
+            
             ppnLong <- paste(kn, ppn, sep = ".")
             parNamesShort <- c(parNamesShort, ppn)
             gradExp[[ppnLong]] <-
@@ -212,7 +213,7 @@ parseCovFormula <- function(formula, where = .GlobalEnv,
     for (pn in tops) {
         ppnLong <- paste(".top", pn, sep = ".")
         parNamesShort <- c(parNamesShort, pn)
-        gradExp[[ppnLong]] <- deparse(D(toDer, pn))
+        gradExp[[ppnLong]] <- deparse(D(toDer, pn), width.cutoff = 500L)
         parsedGradExp[[ppnLong]] <- parse(text = gradExp[[ppnLong]])
     }
     

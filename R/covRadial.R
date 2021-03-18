@@ -1,6 +1,7 @@
 setClass("covRadial",   	
          representation(
              k1Fun1 = "function",
+             k1Fun1Char = "character",
              hasGrad = "logical",
              cov = "integer",               ## 0 : corr, 1 : homo
              iso = "integer",               ## iso = 0
@@ -103,7 +104,9 @@ covRadial <- function(k1Fun1 = k1Fun1Gauss,
             }
         }
     }
-    
+
+
+    k1Fun1Char <- deparse(substitute(k1Fun1))
     k1Fun1 <- match.fun(k1Fun1)
 
     ## =========================================================================
@@ -186,6 +189,7 @@ covRadial <- function(k1Fun1 = k1Fun1Gauss,
     
     new("covRadial", 
         k1Fun1 = k1Fun1,
+        k1Fun1Char = k1Fun1Char,
         hasGrad = as.logical(hasGrad),
         cov = as.integer(cov),
         iso = as.integer(iso),
@@ -349,6 +353,7 @@ setMethod("covMat",
                  
                   dKappa <- attr(Kappa, "der")[ , 1L]
                   
+                  
                   ## ==========================================================
                   ## We now make
                   ##
@@ -382,11 +387,19 @@ setMethod("covMat",
 
                   ## range parameter(s) 
                   if (!object@iso) {
-                      for (ell in 1L:d) {
-                          Grad[sI$kL] <- Grad[sI$kU] <- -sigma2 * H2[ , ell] *
-                              dKappa / theta[ell] / R
-                          GradSym[ , , parN1 + ell] <- Grad
+                    indZeroR <- (R < .Machine$double.eps)
+                    for (ell in 1L:d) {
+                      Grad[sI$kL][!indZeroR] <- Grad[sI$kU][!indZeroR] <- 
+                        - sigma2 * H2[!indZeroR , ell] * 
+                        dKappa[!indZeroR] / theta[ell] / R[!indZeroR]
+                      if (any(indZeroR)){
+                        Grad[sI$kL][indZeroR] <- Grad[sI$kU][indZeroR] <- 
+                          - sigma2 * H2[indZeroR , ell] * 
+                          attr(Kappa, "der")[indZeroR , 2L] / theta[ell]
                       }
+                      GradSym[ , , parN1 + ell] <- Grad
+                    }
+                      
                   } else {
                       Grad[sI$kL] <- Grad[sI$kU] <- -sigma2 * R * dKappa /
                           theta[1L]
@@ -723,6 +736,7 @@ setMethod("show",
             cat("Radial covariance kernel\n")
             cat(paste("o Description:"), object@label, "\n")
             cat(sprintf("o Dimension 'd' (nb of inputs): %d\n", object@d))
+            cat(sprintf("o 'k1' Function used: %s\n", object@k1Fun1Char))
 #             cat(paste("o Kernel depending on: \"", 
 #                       argNames[1], "\", \"", argNames[2], "\"\n", sep=""))
             cat(paste("o Parameters: ",

@@ -337,7 +337,11 @@ setMethod("mle",
                                               args <- list(x0 = parIni[i, ], eval_f = negLogLikFun, 
                                                            lb = parLower, ub = parUpper)
                                               args <- c(args, Ldots)
-                                              do.call(nloptr::nloptr, args = args)
+                                              ## YD: add the trial number to the result to avoid
+                                              ## an error on a cluster (thanks to Julien Pelamatti)
+                                              res <- do.call(nloptr::nloptr, args = args)
+                                              res$ii <- i
+                                              res
                                               ## try removed, due to conflicts with
                                               ## '.errorhandling' (thanks Mickael Binois!)
                                           })
@@ -345,17 +349,19 @@ setMethod("mle",
                               
                               nlist <- length(fitList)
                               ## get the best result
-                              if (nlist==0) stop("All fit trials have failed")
+                              if (nlist == 0) stop("All fit trials have failed")
                               optValueVec <- sapply(fitList, function(x) x$objective)
                               bestIndex <- which.min(optValueVec)
+                              ii <- sapply(fitList, function(x) x$ii)
+                              
                               report <-
-                                  list(parIni = parIni,
+                                  list(parIni = parIni[ii, , drop = FALSE],
                                        par = t(sapply(fitList, function(x) x$solution)),         
                                        logLik = - sapply(fitList, function(x) x$objective),
                                        nIter  = sapply(fitList, function(x) x$iterations),
                                        convergence = sapply(fitList, function(x) x$status %in% c(1, 3, 4)))
                               colnames(report$par) <- colnames(report$parIni)
-                              if (trace > 0) {
+                              if (trace > 0) {                                  
                                   cat("\nOptimisation report:\n\n")
                                   print(as.data.frame(report))
                               }

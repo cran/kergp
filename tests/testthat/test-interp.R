@@ -4,8 +4,8 @@ context("interp")
 branin <- function (x) {
     x1 <- x[1] * 15 - 5
     x2 <- x[2] * 15
-    (x2 - 5/(4 * pi^2) * (x1^2) + 5/pi * x1 - 6)^2 +
-        10 * (1 - 1/(8 * pi)) * cos(x1) + 10
+    (x2 - 5 / (4 * pi^2) * (x1^2) + 5 / pi * x1 - 6)^2 +
+        10 * (1 - 1 / (8 * pi)) * cos(x1) + 10
 }
 
 d <- 2; n <- 16
@@ -65,10 +65,10 @@ precision <- 1e-10
 ## the following tests should work with it,
 ## since the computations are analytical
 
-test_that(desc="Kriging mean (no noise), on the design points", 
+test_that(desc = "Kriging mean (no noise), on the design points", 
           expect_true(max(abs(p$mean - y)) < precision))
 
-test_that(desc="Kriging mean with noise, on the design points", 
+test_that(desc = "Kriging mean with noise, on the design points", 
           expect_true(max(abs(pNoise$mean - y)) < precision))
 
 

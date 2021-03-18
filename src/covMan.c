@@ -70,12 +70,14 @@ SEXP covMat_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
 #ifdef DEBUG 
     Rprintf("npar = %d\n", npar);
 #endif
+    
+    PROTECT_INDEX ikern, idkern;
 
     iindex = INTEGER(index)[0];
   
     PROTECT(dCov = allocMatrix(REALSXP, n, n)); //allocate the n x n matrix  
-    PROTECT(kernValue = allocVector(REALSXP, 1));
-    PROTECT(dkernValue = allocVector(REALSXP, npar));
+    PROTECT_WITH_INDEX(kernValue = allocVector(REALSXP, 1), &ikern);
+    PROTECT_WITH_INDEX(dkernValue = allocVector(REALSXP, npar), &idkern);
     
     PROTECT(attrNm = NEW_CHARACTER(1));
     SET_STRING_ELT(attrNm, 0, mkChar("gradient"));
@@ -104,12 +106,12 @@ SEXP covMat_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
 	}
 	
 	SETCADDR(R_fcall, x2);
-	kernValue = eval(R_fcall, rho);
+	REPROTECT(kernValue = eval(R_fcall, rho), ikern);
 	// Rprintf("kernValue = %7.4f\n", REAL(kernValue)[0]);
 
 	rCov[i + j*n] = REAL(kernValue)[0]; 
 	rCov[j + i*n] = rCov[i + j*n];
-	dkernValue = GET_ATTR(kernValue, attrNm);
+	REPROTECT(dkernValue = GET_ATTR(kernValue, attrNm), idkern);
 
 	//Rprintf("Long attr. %d\n", LENGTH(dkernValue));
 	//Rprintf("Elt 1 %7.3f\n", REAL(dkernValue)[0]);
@@ -306,14 +308,15 @@ SEXP varVec_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
     SEXP dVar, kernValue, dkernValue, attrNm;
     double *rdVar;
     int iindex, npar;
-
+    PROTECT_INDEX ikern, idkern;
+    
     npar = LENGTH(par);
 
     iindex = INTEGER(index)[0];
   
     PROTECT(dVar = allocMatrix(REALSXP, n, 1)); 
-    PROTECT(kernValue = allocVector(REALSXP, 1));
-    PROTECT(dkernValue = allocVector(REALSXP, npar));
+    PROTECT_WITH_INDEX(kernValue = allocVector(REALSXP, 1), &ikern);
+    PROTECT_WITH_INDEX(dkernValue = allocVector(REALSXP, npar), &idkern);
     
     PROTECT(attrNm = NEW_CHARACTER(1));
     SET_STRING_ELT(attrNm, 0, mkChar("gradient"));
@@ -327,9 +330,9 @@ SEXP varVec_covMan(SEXP fun,      // A cov. kernel with TWO vector args + par
       
       SETCADR(R_fcall, x1);
       SETCADDR(R_fcall, x1);
-      kernValue = eval(R_fcall, rho);
+      REPROTECT(kernValue = eval(R_fcall, rho), ikern);
       rVar[i] = REAL(kernValue)[0]; 
-      dkernValue = GET_ATTR(kernValue, attrNm);
+      REPROTECT(dkernValue = GET_ATTR(kernValue, attrNm), idkern);
       rdVar[i] = REAL(dkernValue)[iindex]; 
       
     }

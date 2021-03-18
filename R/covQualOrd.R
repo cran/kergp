@@ -21,6 +21,7 @@ setClass("covOrd",
            parNwarp = "integer",           ## NEW   number of par in warpFun
            k1ParNames = "character",      ## NEW
            warpParNames  = "character",    ## NEW
+           warpKnots = "numeric",         ## NEW   knots for spline warping
            ordered = "logical"
          ),
          validity = function(object){
@@ -41,6 +42,8 @@ covOrd <- function(ordered,
                    par = NULL,
                    parLower = NULL,
                    parUpper = NULL,
+                   warpKnots = NULL,
+                   nWarpKnots = NULL,
                    label = "Ordinal kernel",
                    intAsChar = TRUE, 
                    ...) {
@@ -73,20 +76,37 @@ covOrd <- function(ordered,
   hasGrad <- warpFun$hasGrad
   parNk1 <- as.integer(warpFun$isCdf)
   
-  if (warpFunName == "warpSpline1") {
-    warpParNames <- paste(warpParNames, 1:(L - 1), sep="_")
-    par <- rep(par, L - 1)
-    parUpper <- rep(parUpper, L - 1)
-    parLower <- rep(parLower, L - 1)
-  }
+  splineMatch <- match(warpFunName, c("warpSpline1", "warpSpline2"))
+  if (is.na(splineMatch)){
+    if (!is.null(warpKnots)) warning("'warpKnots' ignored when warping is not a spline")
+    if (!is.null(nWarpKnots)) warning("'nWarpKnots' ignored when warping is not a spline")
+    warpKnots <- numeric(0)
+  } else {
+    if (!is.null(warpKnots) && !is.null(nWarpKnots)) {
+      warning("'nWarpKnots' ignored when 'warpKnots' is provided")
+      nWarpKnots <- length(warpKnots)
+    }
+    if (!is.null(warpKnots)) {
+      warpKnots <- sort(warpKnots)
+      if (warpKnots[1] < 0 || warpKnots[length(warpKnots)] > 1) stop("knots in 'warpKnots' must be in the interval [0, 1]")
+      if (warpKnots[1] > 0) warpKnots <- c(0, warpKnots)
+      if (warpKnots[length(warpKnots)] < 1) warpKnots <- c(warpKnots, 1)
+    }
   
-  if (warpFunName == "warpSpline2") {
-    warpParNames <- paste(warpParNames, 1:L, sep="_")
-    par <- rep(par, L)
-    parUpper <- rep(parUpper, L)
-    parLower <- rep(parLower, L)
-  }
-  
+    if (is.null(nWarpKnots) & is.null(warpKnots)) nWarpKnots <- L
+    if (!is.null(nWarpKnots)) {
+      warpKnots <- seq(from = 0, to = 1, length.out = as.integer(nWarpKnots))
+    } 
+    if (!is.null(warpKnots)){
+      nWarpKnots <- length(warpKnots)
+      if (nWarpKnots > L) stop("'nWarpKnots' must not be larger than the number of levels")
+    }
+    parNwarp <- c(nWarpKnots - 1, nWarpKnots)[splineMatch]
+    warpParNames <- paste(warpParNames, 1:parNwarp, sep="_")
+    par <- rep(par, parNwarp)
+    parUpper <- rep(parUpper, parNwarp)
+    parLower <- rep(parLower, parNwarp)
+  }  
   kernParNames <- warpParNames
   parNwarp <- length(warpParNames)
   
@@ -144,7 +164,7 @@ covOrd <- function(ordered,
   } else {
     thisCovLevel <- function(par, lowerSQRT = FALSE, compGrad = FALSE){
       z <- seq(from = 0, to = 1, length.out = L)
-      x <- do.call(warpFun$fun, list(z, par[1:parNwarp], L = L))
+      x <- do.call(warpFun$fun, list(z, par[1:parNwarp], L = L, knots = warpKnots))
       K <- matrix(1, nrow = L, ncol = L)
       sI <- symIndices(L)
       Hsym <- (x[sI$i] - x[sI$j]) 
@@ -195,6 +215,7 @@ covOrd <- function(ordered,
       parNwarp = parNwarp,     
       k1ParNames = character(0), 
       warpParNames  = warpParNames,
+      warpKnots = warpKnots,
       ordered = TRUE,
       intAsChar = intAsChar,
       ...

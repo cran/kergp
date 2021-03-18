@@ -129,6 +129,17 @@ where \eqn{z_1, \dots, z_L}{z[1], ..., z[L]} form a regular sequence from \eqn{0
     \item{\code{warpParNames}:}{
       Object of class \code{"character"}. Parameter names of \code{warpFun}.
     }
+    \item{\code{warpKnots}:}{
+      Object of class \code{"numeric"}. Parameters of \code{warpFun}.
+    }
+    \item{\code{ordered}:}{
+      Object of class \code{"logical"}. \code{TRUE} for an ordinal input.
+    }
+    \item{\code{intAsChar}:}{
+      Object of class \code{"logical"}. If \code{TRUE} (default), 
+      an integer-valued input will be coerced into a character.
+      Otherwise, it will be coerced into a factor.
+    }
   }
 }
 

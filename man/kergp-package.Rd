@@ -58,7 +58,7 @@
   (2013).
   "ANOVA kernels and RKHS of zero mean functions for model-based sensitivity analysis".
   \emph{Journal of Multivariate Analysis}, 115, 57-67.
-  \href{http://www.sciencedirect.com/science/article/pii/S0047259X1200214X}{link}
+  \href{https://www.sciencedirect.com/science/article/pii/S0047259X1200214X}{link}
   
   David Ginsbourger, Xavier Bay, Olivier Roustant, Laurent Carraro
   (2012).
@@ -71,13 +71,13 @@
   "Kernels and designs for modelling invariant functions: From group invariance to additivity".
   \emph{mODa 10 - Advances in Model-Oriented Design and
   Analysis. Contributions to Statistics}, 107-115.
-  \href{http://link.springer.com/book/10.1007/978-3-319-00218-7}{link}
+  \href{https://link.springer.com/book/10.1007/978-3-319-00218-7}{link}
   
   Olivier Roustant, David Ginsbourger, Yves Deville (2012).
   "DiceKriging, DiceOptim: Two R Packages for the Analysis of
   Computer Experiments by Kriging-Based Metamodeling and Optimization".
   \emph{Journal of Statistical Software}, 51(1), 1-55.
-  \href{http://www.jstatsoft.org/v51/i01/}{link}
+  \href{https://www.jstatsoft.org/v51/i01/}{link}
   
 }
 %%\keyword{ package }

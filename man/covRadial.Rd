@@ -18,7 +18,7 @@
 
     A function of a \emph{scalar} numeric variable, and possibly of an
     extra "shape" parameter. This function should return the first-order
-    derivative or the two-first order derivatives as an attibute with
+    derivative or the two-first order derivatives as an attribute with
     name \code{"der"} and with a matrix content. When an extra shape
     parameter exists, the gradient should also be returned as an
     attribute with name \code{"gradient"}, see \bold{Examples}
@@ -28,8 +28,8 @@
   \item{cov}{
 
     A character string specifying the kind of covariance kernel:
-    correlation kernel ("corr") or kernel of a homoscedastic GP ("homo").
-    Partial matching is allowed.
+    correlation kernel (\code{"corr"}) or kernel of a homoscedastic GP
+    (\code{"homo"}).  Partial matching is allowed.
 
   }
   \item{iso}{
@@ -65,7 +65,7 @@
   \item{parNames}{
 
     Names of the parameters. By default, ranges are prefixed
-    \code{"theta_"} in the non-iso case and the range is names
+    \code{"theta_"} in the non-iso case and the range is named
     \code{"theta"} in the iso case.
     
   }
@@ -87,13 +87,13 @@
 }
 \description{
 
-  Creator for the class \code{"covRadial"}, which describles \emph{radial
+  Creator for the class \code{"covRadial"}, which describes \emph{radial
     kernels}.
 
 }
 \details{
 
-  A radial kernel on the \eqn{d}-dimensional euclidean space
+  A radial kernel on the \eqn{d}-dimensional Euclidean space
   takes the form 
   \deqn{K(\mathbf{x},\,\mathbf{x}') = \sigma^2 k_1(r)}{K(x, x') =
     sigma^2 * k1(r)}
@@ -112,8 +112,8 @@
       \theta}{theta[l]=theta} for all \eqn{\ell}{l}. This is obtained
     by using \code{iso = TRUE}.
 
-  A \emph{correlation} version uses  \eqn{\sigma^2 = 1}{sigma2 = 1}. This
-  is obtained by using \eqn{cov = "corr"}.
+  A \emph{correlation} version uses \eqn{\sigma^2 = 1}{sigma2 = 1}. This
+  is obtained by using \code{cov = "corr"}.
 
   Finally, the correlation kernel \eqn{k_1(r)}{k1(r)} can depend on a
   "shape" parameter, e.g. have the form \eqn{k_1(r;\,\alpha)}{k1(r,
@@ -128,23 +128,20 @@
 
   When \code{k1Fun1} has more than one formal argument, its arguments
   with position \code{> 1} are assumed to be "shape" parameters of the
-  model. Examples are functions with formals
-  \code{function(x, shape = 1.0)} or
-  \code{function(x, alpha = 2.0, beta = 3.0)},
-  corresponding to
-  vector of parameter names \code{c("shape")} and
-  \code{c("alpha", "beta")}.
-  For now only more thant one shape parameter has not been
-  tested.
+  model. Examples are functions with formals \code{function(x, shape =
+  1.0)} or \code{function(x, alpha = 2.0, beta = 3.0)}, corresponding to
+  vector of parameter names \code{c("shape")} and \code{c("alpha",
+  "beta")}.  Using more than one shape parameter has not been tested
+  yet.
   
   Remind that using a one-dimensional correlation kernel
-   \eqn{k_1(r)}{k1(r)} here \emph{does not} warrant that a positive
-   semi-definite kernel will result for \emph{any} dimension
-   \eqn{d}. This question relates to Schoenberg's theorem and the concept
-   of completely monotone functions.
-   
-} 
-\seealso{ 
+  \eqn{k_1(r)}{k1(r)} here \emph{does not} warrant that a positive
+  semi-definite kernel will result for \emph{any} dimension
+  \eqn{d}. This question relates to Schoenberg's theorem and the concept
+  of completely monotone functions.
+  
+}
+\seealso{
 
   \code{\link{k1Fun1Exp}}, \code{\link{k1Fun1Matern3_2}},
   \code{\link{k1Fun1Matern5_2}} or \code{\link{k1Fun1Gauss}} for

@@ -18,21 +18,23 @@ prinKrige(object)
 \value{
 
   A list \itemize{
-    
-    \item{\code{values}}{The eigenvalues of the energy bending
-      matrix in \emph{ascending} order. The first \eqn{p} values
-      must be very close to zero, but will not be zero since they
-      are provided by numeric linear algebra.}
-    
-    \item{\code{vectors}}{A matrix \eqn{\mathbf{U}}{U} with its
-      columns \eqn{\mathbf{u}_i}{U[ , i]} equal to the
-      eigenvectors of the energy bending matrix, in
-      correspondence with the eigenvalues \eqn{e_i}{e[i]}.}
-    
-    \item{\code{B}}{The Energy Bending Matrix
-      \eqn{\mathbf{B}}{B}. Remind that the eigenvectors are used
-      here in the ascending order of the eigenvalues, which is
-      the reverse of the usual order.}
+    \item{\code{values}}{
+      The eigenvalues of the energy bending matrix in \emph{ascending}
+      order. The first \eqn{p} values must be very close to zero, but
+      will not be zero since they are provided by numerical linear
+      algebra.
+    }
+    \item{\code{vectors}}{
+      A matrix \eqn{\mathbf{U}}{U} with its columns
+      \eqn{\mathbf{u}_i}{U[ , i]} equal to the eigenvectors of the
+      energy bending matrix, in correspondence with the eigenvalues
+      \eqn{e_i}{e[i]}.
+    }
+    \item{\code{B}}{
+      The Energy Bending Matrix \eqn{\mathbf{B}}{B}. Remind that the
+      eigenvectors are used here in the ascending order of the
+      eigenvalues, which is the reverse of the usual order.
+    }
     
   }
 }
@@ -47,23 +49,23 @@ prinKrige(object)
   symmetric positive matrix \eqn{\mathbf{B}}{B} named the \emph{Bending
   Energy Matrix} which is met when combining a linear trend and a
   covariance kernel as done in \code{\link{gp}}. This matrix has
-  dimension \eqn{n \times n}{n * n} and rank {n - p}. The PKF are given
-  in the \emph{ascending} order of the eigenvalues \eqn{e_i}{e[i]}
+  dimension \eqn{n \times n}{n * n} and rank \eqn{n - p}. The PKF are
+  given in the \emph{ascending} order of the eigenvalues \eqn{e_i}{e[i]}
   \deqn{e_1 = e_2 = \dots = e_p = 0 < e_{p+1} \leq e_{p+2} \leq \dots
   \leq e_n.}{ e[1] = e[2] = ... = e[p] = 0 < e[p + 1] <= e[p + 2] <=
   ... <= e[n].} The \eqn{p} first PKF generate the same space as do the
   \eqn{p} columns of the trend matrix \eqn{\mathbf{F}}{F}, say
-  \eqn{\textrm{colspan}(F)}{colspan(F)}. The following \eqn{n-p} PKFs
-  generate a supplementary of the subspace
-  \eqn{\textrm{colspan}(F)}{colspan(F)}, and they have a decreasing
+  \eqn{\textrm{colspan}(\mathbf{F})}{colspan(F)}. The following
+  \eqn{n-p} PKFs generate a supplementary of the subspace
+  \eqn{\textrm{colspan}(\mathbf{F})}{colspan(F)}, and they have a decreasing
   influence on the response. So the \eqn{p +1}-th PKF can give a hint on
   a possible deterministic trend functions that could be added to the
   \eqn{p} existing ones.
 
-  The matrix \eqn{\mathbf{B}}{B} is such that \eqn{\mathbf{B} \mathbf{F} =
-    \mathbf{0}}{B F = 0}, so the colums of \eqn{\mathbf{F}}{F} can be
-  thought of as the eigenvectors that are associated with the null
-  eigenvalues \eqn{e_1}{e[1]}, \eqn{\dots}{...}, \eqn{e_p}{e[p]}.
+  The matrix \eqn{\mathbf{B}}{B} is such that \eqn{\mathbf{B} \mathbf{F}
+    = \mathbf{0}}{B F = 0}, so the columns of \eqn{\mathbf{F}}{F} can be
+    thought of as the eigenvectors that are associated with the zero
+    eigenvalues \eqn{e_1}{e[1]}, \eqn{\dots}{...}, \eqn{e_p}{e[p]}.
   
 }
 \note{

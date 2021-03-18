@@ -10,37 +10,51 @@ covOrd(ordered,
        cov = c("corr", "homo"), 
        hasGrad = TRUE, inputs = "u", 
        par = NULL, parLower = NULL, parUpper = NULL, 
+       warpKnots = NULL, nWarpKnots = NULL,
        label = "Ordinal kernel", 
        intAsChar = TRUE, 
        ...)
 }
 \arguments{
   \item{ordered}{
-    An object coerced to \code{\link{ordered}} representing an ordinal input. Only the levels and their order will be used.
+    An object coerced to \code{\link{ordered}} representing an ordinal input. 
+    Only the levels and their order will be used.
   }
   \item{k1Fun1}{
     A function representing a 1-dimensional stationary kernel function, with no or fixed parameters.
 }
   \item{warpFun}{
-    Name of the increasing warping function.
+    Character corresponding to an increasing warping function. See \code{\link{warpFun}}.
 }
   \item{cov}{
     Character indicating whether a correlation or homoscedastic kernel is used.
 }
   \item{hasGrad}{
-    Object of class \code{"logical"}. If \code{TRUE}, both \code{k1Fun1} and \code{warpFun} must return the gradient as an attribute of the result.
+    Object of class \code{"logical"}. If \code{TRUE}, both \code{k1Fun1} and \code{warpFun} 
+    must return the gradient as an attribute of the result.
 }
   \item{inputs}{
     Character: name of the ordinal input.
 }
   \item{par, parLower, parUpper}{
-    Numeric vectors containing covariance parameter values/bounds in the following order: warping, range and variance if required (\code{cov == "homo"}).
+    Numeric vectors containing covariance parameter values/bounds in the following order: 
+    warping, range and variance if required (\code{cov == "homo"}).
 }
+  \item{warpKnots}{
+    Numeric vector containing the knots used when a spline warping is chosen. 
+    The knots must be in [0, 1], and 0 and 1 are automatically added if not provided. 
+    The number of knots cannot be greater than the number of levels.
+  }
+  \item{nWarpKnots}{
+    Number of knots when a spline warping is used. Ignored if \code{warpKnots} is given. 
+    \code{nWarpKnots} cannot be greater than the number of levels.
+  }
   \item{label}{
     Character giving a brief description of the kernel.
 }
   \item{intAsChar}{
-  Logical. If \code{TRUE} (default), an integer-valued input will be coerced into a character. Otherwise, it will be coerced into a factor.
+  Logical. If \code{TRUE} (default), an integer-valued input will be coerced into a character. 
+  Otherwise, it will be coerced into a factor.
 }
   \item{\dots}{
     Not used at this stage.
@@ -51,13 +65,17 @@ covOrd(ordered,
 Covariance kernel for qualitative ordered inputs obtained by warping. 
 
 Let \eqn{u} be an ordered factor with levels \eqn{u_1, \dots, u_L}{u[1], ..., u[L]}. 
-Let \eqn{k_1}{k1} be a 1-dimensional stationary kernel (with no or fixed parameters), \eqn{F} a warping function i.e. an increasing function on the interval \eqn{[0,1]} and \eqn{\theta}{theta} a scale parameter. Then \eqn{k} is defined by:
+Let \eqn{k_1}{k1} be a 1-dimensional stationary kernel (with no or fixed parameters), 
+\eqn{F} a warping function i.e. an increasing function on the interval \eqn{[0,1]} 
+and \eqn{\theta}{theta} a scale parameter. Then \eqn{k} is defined by:
 \deqn{k(u_i, u_j) = k_1([F(z_i) - F(z_{j})]/\theta)}{k(u[i], u[j]) = k1([F(z[i]) - F(z[j])]/theta)}
-where \eqn{z_1, \dots, z_L}{z[1], ..., z[L]} form a regular sequence from \eqn{0} to \eqn{1} (included). At this stage, the possible choices are:
+where \eqn{z_1, \dots, z_L}{z[1], ..., z[L]} form a regular sequence from \eqn{0} to \eqn{1} (included). 
+At this stage, the possible choices are:
 \itemize{
 \item A distribution function (cdf) truncated to \eqn{[0,1]}, among the Power and Normal cdfs. 
 \item For the Normal distribution, an unnormalized version, corresponding to the restriction of the cdf on \eqn{[0,1]}, is also implemented (\code{warp = "unorm"}).
-\item An increasing spline of degree 1 (piecewise linear function) or 2. In this case, \eqn{F} is unnormalized. For degree 2, the implementation depends on scaling functions from DiceKriging package, which must be loaded here.
+\item An increasing spline of degree 1 (piecewise linear function) or 2. In this case, \eqn{F} is unnormalized. 
+For degree 2, the implementation depends on scaling functions from DiceKriging package, which must be loaded here.
 }
 Notice that for unnormalized \code{F}, we set \eqn{\theta}{theta} to 1, in order to avoid overparameterization.
 }
@@ -68,7 +86,7 @@ An object of class \code{covOrd-class}, inheriting from \code{covQual-class}.
 %}
 
 \seealso{
-\code{\link{covOrd-class}}
+\code{\link{covOrd-class}}, \code{\link{warpFun}}
 }
 \examples{
 u <- ordered(1:6, labels = letters[1:6])

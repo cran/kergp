@@ -1,31 +1,29 @@
-\name{covRadial-class}
+\name{covTP-class}
 \Rdversion{1.1}
 \docType{class}
-\alias{covRadial-class}
-\alias{coef<-,covRadial,numeric-method}
-\alias{coefLower<-,covRadial-method}
-\alias{coefLower,covRadial-method}
-\alias{coef,covRadial-method}
-\alias{coefUpper<-,covRadial-method}
-\alias{coefUpper,covRadial-method}
-\alias{covMat,covRadial-method}
-\alias{npar,covRadial-method}
-\alias{scores,covRadial-method}
-\alias{show,covRadial-method}
-\alias{varVec,covRadial-method}
+\alias{covTP-class}
+\alias{coef,covTP-method}
+\alias{coef<-,covTP,numeric-method}
+\alias{coefLower,covTP-method}
+\alias{coefLower<-,covTP-method}
+\alias{coefUpper,covTP-method}
+\alias{coefUpper<-,covTP-method}
+\alias{covMat,covTP-method}
+\alias{npar,covTP-method}
+\alias{scores,covTP-method}
+\alias{show,covTP-method}
+\alias{varVec,covTP-method}
 
-\title{Class \code{"covRadial"}}
-
+\title{Class \code{"covTP"}}
 \description{
 
-  Class of radial covariance kernels.
+   S4 class representing a Tensor Product (TP) covariance kernel.
   
 }
 \section{Objects from the Class}{
   
-  Objects can be created by calls of the form \code{covRadial(...)}  of
-  \code{new("covRadial", ...)}.
-
+  Objects can be created by calls of the form \code{new("covTP", ...)}
+  or by using the \code{\link{covTP}} function.
   
 }
 \section{Slots}{
@@ -33,9 +31,7 @@
     \item{\code{k1Fun1}:}{
 
       Object of class \code{"function"} A function of a scalar numeric
-      variable. Note that using a one-dimensional kernel here \emph{does
-      not} warrant that a positive semi-definite kernel results for any
-      dimension \eqn{d}.
+      variable.
 
     }
     \item{\code{k1Fun1Char}:}{
@@ -48,7 +44,7 @@
 
       Object of class \code{"logical"}. Tells if the value returned by
       the function \code{kern1Fun} has an attribute named \code{"der"}
-      giving the derivative(s). 
+      giving the derivative(s).
 
     }
     \item{\code{cov}:}{
@@ -56,13 +52,20 @@
       Object of class \code{"integer"}. The value \code{0L} corresponds
       to a correlation kernel while \code{1L} is for a covariance
       kernel.
-
+      
     }
     \item{\code{iso}:}{
 
       Object of class \code{"integer"}. The value \code{1L} corresponds
       to an isotropic covariance, with all the inputs sharing the same
       range value.
+
+    }
+    \item{\code{iso1}:}{
+
+      Object of class \code{"integer"} used only when the function in
+      the slot \code{k1Fun1} depends on parameters i.e. has more than
+      one formal argument. NOT IMPLEMENTED YET.  
 
     }
     \item{\code{label}:}{
@@ -99,13 +102,21 @@
       Object of class \code{"numeric"}. Numeric values for the
       parameters. Can be \code{NA}.
 
+
+    }
+    \item{\code{kern1ParN1}:}{
+
+      Object of class \code{"integer"}. The number of parameters in
+      \code{k1Fun1} (such as a shape).
+
     }
     \item{\code{parN1}:}{
-
+      
       Object of class \code{"integer"}. Number of parameters of the
       function \code{kern1Fun} (such as a shape).
 
-    } \item{\code{parN}:}{
+    }
+    \item{\code{parN}:}{
 
       Object of class \code{"integer"}. Number of parameters for the
       object. The include: \emph{direct} parameters in the function
@@ -121,95 +132,97 @@
     \item{\code{kernParNames}:}{
 
       Object of class \code{"character"}. Names of the parameters.
-
+      
     }
+  
   }
 }
 \section{Extends}{
-  
+
   Class \code{"\linkS4class{covAll}"}, directly.
 
 }
 \section{Methods}{
   \describe{
-    \item{coef<-}{
-      
-      \code{signature(object = "covRadial", value = "numeric")}: Set the
-      vector of values for the parameters.
-      
-    }
-    \item{coefLower<-}{
-      
-      \code{signature(object = "covRadial")}: Set the vector of lower
-      bounds on the parameters. 
+    \item{coef}{
 
+      \code{signature(object = "covTP")}: Get the vector of values for
+      the parameters.
+
+    }
+    \item{coef<-}{
+
+      \code{signature(object = "covTP", value = "numeric")}: Set the
+      vector of values for the parameters.
+ 
     }
     \item{coefLower}{
 
-      \code{signature(object = "covRadial")}: Get the vector of
+      \code{signature(object = "covTP")}: Get the vector of
       lower bounds on the parameters.
 
     }
-    \item{coef}{
-      
-      \code{signature(object = "covRadial")}: Get the vector of values
-      for the parameters.
+    \item{coefLower<-}{
 
-    }
-    \item{coefUpper<-}{
-
-      \code{signature(object = "covRadial")}: Set the vector of upper
-      bounds on the parameters. 
+      \code{signature(object = "covTP")}: Set the vector of lower
+      bounds on the parameters.
 
     }
     \item{coefUpper}{
 
-      \code{signature(object = "covRadial")}: Get the vector of upper
+      \code{signature(object = "covTP")}: Get the vector of upper
+      bounds on the parameters.
+      
+    }
+    \item{coefUpper<-}{
+
+      \code{signature(object = "covTP")}: Set the vector of upper
       bounds on the parameters. 
 
     }
     \item{covMat}{
 
-      \code{signature(object = "covRadial")}: Compute the covariance
+      \code{signature(object = "covTP")}: Compute the covariance
       matrix for given sites.
 
     }
     \item{npar}{
 
-      \code{signature(object = "covRadial")}: Get the number of
+      \code{signature(object = "covTP")}: Get the number of
       parameters.
 
     }
     \item{scores}{
 
-      \code{signature(object = "covRadial")}: Compute the scores
+      \code{signature(object = "covTP")}: Compute the scores
       i.e. the derivatives w.r.t. the parameters of the contribution of
       the covariance in the log-likelihood of a \code{gp}.
 
     }
     \item{show}{
 
-      \code{signature(object = "covRadial")}: Print or show the object.
+      \code{signature(object = "covTP")}: Print or show the object.
 
     }
     \item{varVec}{
 
-      \code{signature(object = "covRadial")}: Compute the variance
+      \code{signature(object = "covTP")}: Compute the variance
       vector for given sites.
 
     }
   }
 }
 %% \references{}
-%% \note{}
+%% \author{ }
+%% \note{ }
 \seealso{
-
-  The creator function \code{\link{covRadial}}, where some details are
-  given on the form of kernel.  \code{\link{covMan}} and
-  \code{\linkS4class{covMan}} for a comparable but more general class.
+  
+  \code{\linkS4class{covRadial}} which is a similar covariance class and
+  \code{\link{covTP}} which is intended to be the standard creator
+  function for this class.
 
 }
 \examples{
-showClass("covRadial")
+showClass("covTP")
 }
 \keyword{classes}

@@ -45,7 +45,9 @@ SEXP scores_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   
   SEXP dimXt, dimParMap, R_fcall, x1_ell, x2_ell, par_ell,
     kernValue, dkernValue,  attrNm, scores;
-  
+
+  PROTECT_INDEX ikern, idkern;
+
   if (!isFunction(fun)) error("'fun' must be a function");
   if (!isMatrix(Xt)) error("'Xt' must be a matrix");
   if(!isEnvironment(rho)) error("'rho' should be an environment");
@@ -98,9 +100,10 @@ SEXP scores_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
   rscores = REAL(scores);
 
   PROTECT(R_fcall = lang4(fun, x1_ell, x2_ell, par_ell)); 
-  PROTECT(kernValue = allocVector(REALSXP, 1));
-  PROTECT(dkernValue = allocVector(REALSXP, p));
-  
+
+  PROTECT_WITH_INDEX(kernValue = allocVector(REALSXP, 1), &ikern);
+  PROTECT_WITH_INDEX(dkernValue = allocVector(REALSXP, p), &idkern);
+
   PROTECT(attrNm = NEW_CHARACTER(1));
   SET_STRING_ELT(attrNm, 0, mkChar("gradient"));
 
@@ -132,8 +135,8 @@ SEXP scores_covTS(SEXP fun,      // kernel depends on 2 scalar sites + 1 par
 	}
 	
 	SETCADDDR(R_fcall, par_ell);
-	kernValue = eval(R_fcall, rho);
-	dkernValue = GET_ATTR(kernValue, attrNm);
+	REPROTECT(kernValue = eval(R_fcall, rho), ikern);
+	REPROTECT(dkernValue = GET_ATTR(kernValue, attrNm), idkern);
 	
 	for (k = 0; k < p; k++) {
 	  ipoint = iparMap[ell * p + k];

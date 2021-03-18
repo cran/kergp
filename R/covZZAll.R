@@ -3,7 +3,8 @@
 ## ------------
 
 setClassUnion("covAll",
-              c("covTS", "covMan", "covComp", "covQual", "covRadial"))
+              c("covTS", "covMan", "covComp", "covQual", "covRadial",
+                "covTP", "covANOVA"))
 
 
 ##***********************************************************************

@@ -182,7 +182,7 @@
 \note{
 
   The names of the methods strive to respect a
-  \href{http://en.wikipedia.org/wiki/CamelCase}{camelCase} naming
+  \href{https://en.wikipedia.org/wiki/CamelCase}{camelCase} naming
   convention.
 
   While the \code{coef<-} replacement method is typically intended
