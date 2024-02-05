@@ -95,13 +95,13 @@ k1Fun1Matern5_2(x)
 
   C.E. Rasmussen and C.K.I. Williams (2006), \emph{Gaussian Processes
     for Machine Learning}, the MIT Press,
-  \url{http://www.GaussianProcess.org/gpml/}
+  \doi{10.7551/mitpress/3206.001.0001}
   
   O. Roustant, D. Ginsbourger, Y. Deville (2012).
   "DiceKriging, DiceOptim: Two R Packages for the Analysis of
   Computer Experiments by Kriging-Based Metamodeling and Optimization."
   \emph{Journal of Statistical Software}, 51(1), 1-55.
-  \url{https://www.jstatsoft.org/v51/i01/}
+  \doi{10.18637/jss.v051.i01}
   %%M.L. Stein (1999), \emph{Interpolation of spatial data, some theory
   %%  for kriging}, Springer.
 

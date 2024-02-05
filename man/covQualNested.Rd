@@ -72,9 +72,7 @@ covQualNested(input = "x",
     Default is \code{"Diag"}, corresponding to a compound symmetry matrix.
     
   }
-  \item{covBet}{
-  }
-  \item{covWith}{
+  \item{covBet,covWith}{
     
     Character vector indicating the type of covariance matrix to be used
     for the generator between- or within- matrices, 

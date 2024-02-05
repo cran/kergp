@@ -43,7 +43,7 @@
 
   C.E. Rasmussen and C.K.I. Williams (2006), \emph{Gaussian Processes
     for Machine Learning}, the MIT Press,
-  \url{http://www.GaussianProcess.org/gpml/}
+  \doi{10.7551/mitpress/3206.001.0001}
   
 }
 \note{

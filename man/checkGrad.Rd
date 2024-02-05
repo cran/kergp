@@ -68,8 +68,6 @@ checkGrad(object, sym = TRUE,
   
   A list of results related to the Jacobians
 
-  \itemize{
-    
     \item{\code{test}}{ Max of the absolute difference between
       the gradient obtained by numeric differentiation and the
       gradient provided by the kernel object. }
@@ -84,7 +82,6 @@ checkGrad(object, sym = TRUE,
       \code{NULL} if the determination of the matrix \code{x2}
       was not necessary. }
     
-  }
 }
 \description{
 

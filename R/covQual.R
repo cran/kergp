@@ -452,8 +452,8 @@ plot.covQual <- function(x, type = c("cov", "cor", "warping"), ...){
     }
   }
   if (type == "warping"){
-    if (class(x) != "covOrd"){
-      warning("Type 'warping' only works for an ordinal factor")
+    if (!inherits(class(x), "covOrd")){
+        warning("Type 'warping' only works for an ordinal factor")
       return(NULL)
     }
     parWarp <- coef(x)[1:x@parNwarp]

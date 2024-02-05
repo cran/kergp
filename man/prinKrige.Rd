@@ -17,7 +17,7 @@ prinKrige(object)
 }
 \value{
 
-  A list \itemize{
+  A list 
     \item{\code{values}}{
       The eigenvalues of the energy bending matrix in \emph{ascending}
       order. The first \eqn{p} values must be very close to zero, but
@@ -36,7 +36,6 @@ prinKrige(object)
       eigenvalues, which is the reverse of the usual order.
     }
     
-  }
 }
 \description{
 

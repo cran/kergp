@@ -40,10 +40,10 @@
 \author{
 
   Yves Deville (Alpestat), David Ginsbourger (University of Bern),
-  Olivier Roustant (Mines Saint-Étienne), with contributions from
+  Olivier Roustant (INSA Toulouse), with contributions from
   Nicolas Durrande (Mines Saint-Étienne).
 
-  Maintainer: Olivier Roustant, <olivier.roustant@mines-stetienne.fr>
+  Maintainer: Olivier Roustant, <roustant@insa-toulouse.fr>
 
 }
 \references{
@@ -77,8 +77,7 @@
   "DiceKriging, DiceOptim: Two R Packages for the Analysis of
   Computer Experiments by Kriging-Based Metamodeling and Optimization".
   \emph{Journal of Statistical Software}, 51(1), 1-55.
-  \href{https://www.jstatsoft.org/v51/i01/}{link}
-  
+  \doi{10.18637/jss.v051.i01}
 }
 %%\keyword{ package }
 %%\seealso{}

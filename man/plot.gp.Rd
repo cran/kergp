@@ -45,7 +45,7 @@
   }
   \item{which}{
 
-    A subset of {1, 2, 3} indicating which figures to plot (see
+    A subset of \eqn{\{1, 2, 3\}} indicating which figures to plot (see
     \code{Description} above). Default is 1:3 (all figures).
 
   }\item{...}{

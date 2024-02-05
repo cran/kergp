@@ -101,13 +101,15 @@ This may happen when the covariance kernel is not (either theoretically or numer
   list with more results. This list which is given the S3 class
   \code{"simulate.gp"} has the following elements.
   
-  \itemize{ \item{\code{X}, \code{F}, \code{y}}{ Inputs,
+    \item{\code{X}, \code{F}, \code{y}}{ Inputs,
       trend covariates and response. } \item{\code{XNew},
       \code{FNew}}{ New inputs, new trend covariates. }
     \item{\code{sim}}{ Matrix of simulated paths. }
     \item{\code{trend}}{ Matrix of simulated trends. }
     \item{\code{trendKnown}, \code{noise}, \code{newVarNoise}}{
-      Values of the formals. } \item{\code{Call}}{ The call. } }
+      Values of the formals. } 
+    \item{\code{Call}}{ The call. } 
+
 }
 \description{
 

@@ -83,7 +83,7 @@ checkGrad <- function(object,
                       XLower = NULL, XUpper = NULL,
                       plot = TRUE) {
 
-    if (class(object) != "covMan") {
+    if (!inherits(object, "covMan")) {
         stop("For now this function works only when 'object'\n",
              "has class \"covMan\"") 
     }

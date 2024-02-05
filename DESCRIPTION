@@ -1,8 +1,8 @@
 Package: kergp
 Type: Package
 Title: Gaussian Process Laboratory
-Version: 0.5.5
-Date: 2021-03-17
+Version: 0.5.7
+Date: 2024-02-05
 Author: Yves Deville, David Ginsbourger, Olivier Roustant. Contributors: Nicolas Durrande.
 Maintainer: Olivier Roustant <roustant@insa-toulouse.fr>
 Description: Gaussian process regression with an emphasis on kernels.
@@ -28,6 +28,6 @@ Collate: 'CovFormulas.R' 'allGenerics.R' 'checkGrad.R' 'covComp.R'
         'methodMLE.R' 'miscUtils.R' 'prinKrige.R' 'q1Diag.R'
         'simulate_gp.R' 'warpFuns.R'
 NeedsCompilation: yes
-Packaged: 2021-03-17 18:53:02 UTC; yves
+Packaged: 2024-02-05 09:37:52 UTC; yves
 Repository: CRAN
-Date/Publication: 2021-03-18 09:50:03 UTC
+Date/Publication: 2024-02-05 12:30:09 UTC
