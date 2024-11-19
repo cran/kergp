@@ -75,7 +75,7 @@
 }
 \seealso{
 
-  The \code{\link{mvrnorm}} function.
+  The \code{\link[MASS]{mvrnorm}} function.
 
 }
 \examples{

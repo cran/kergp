@@ -1,10 +1,17 @@
 Package: kergp
 Type: Package
 Title: Gaussian Process Laboratory
-Version: 0.5.7
-Date: 2024-02-05
-Author: Yves Deville, David Ginsbourger, Olivier Roustant. Contributors: Nicolas Durrande.
-Maintainer: Olivier Roustant <roustant@insa-toulouse.fr>
+Version: 0.5.8
+Date: 2024-11-19
+Authors@R: c(person(given = "Yves", family = "Deville", role = "aut",
+                    email = "deville.yves@alpestat.com",
+                    comment = c(ORCID = "0000-0002-1233-488X")),
+             person(given = "David", family = "Ginsbourger", role = "aut",
+	            email = "david.ginsbourger@stat.unibe.ch",
+	            comment = c(ORCID = "0000-0003-2724-2678")),
+             person(given = "Olivier", family = "Roustant", role = c("aut", "cre"),
+	            email = "roustant@insa-toulouse.fr"),
+             person(given = "Nicolas", family = "Durrande", role = "ctb"))
 Description: Gaussian process regression with an emphasis on kernels.
     Quantitative and qualitative inputs are accepted. Some pre-defined
     kernels are available, such as radial or tensor-sum for
@@ -28,6 +35,11 @@ Collate: 'CovFormulas.R' 'allGenerics.R' 'checkGrad.R' 'covComp.R'
         'methodMLE.R' 'miscUtils.R' 'prinKrige.R' 'q1Diag.R'
         'simulate_gp.R' 'warpFuns.R'
 NeedsCompilation: yes
-Packaged: 2024-02-05 09:37:52 UTC; yves
+Packaged: 2024-11-19 13:49:14 UTC; yves
+Author: Yves Deville [aut] (<https://orcid.org/0000-0002-1233-488X>),
+  David Ginsbourger [aut] (<https://orcid.org/0000-0003-2724-2678>),
+  Olivier Roustant [aut, cre],
+  Nicolas Durrande [ctb]
+Maintainer: Olivier Roustant <roustant@insa-toulouse.fr>
 Repository: CRAN
-Date/Publication: 2024-02-05 12:30:09 UTC
+Date/Publication: 2024-11-19 14:40:03 UTC

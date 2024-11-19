@@ -51,33 +51,36 @@
   Nicolas Durrande, David Ginsbourger, Olivier Roustant (2012).
   "Additive covariance kernels for high-dimensional gaussian process modeling".
   \emph{Annales de la Faculté des Sciences de Toulouse}, 21 (3):
-  481-499.
-  \href{https://afst.centre-mersenne.org/item/AFST_2012_6_21_3_481_0}{link}
+  481-499,
+  %% \href{https://afst.centre-mersenne.org/item/AFST_2012_6_21_3_481_0}{link}
+  \doi{10.5802/afst.1342}.
   
   Nicolas Durrande, David Ginsbourger, Olivier Roustant, Laurent Carraro
   (2013).
   "ANOVA kernels and RKHS of zero mean functions for model-based sensitivity analysis".
-  \emph{Journal of Multivariate Analysis}, 115, 57-67.
-  \href{https://www.sciencedirect.com/science/article/pii/S0047259X1200214X}{link}
+  \emph{Journal of Multivariate Analysis}, 115, 57-67,
+  \doi{10.1016/j.jmva.2012.08.016}.
   
   David Ginsbourger, Xavier Bay, Olivier Roustant, Laurent Carraro
   (2012).
   "Argumentwise invariant kernels for the approximation of invariant functions".
   \emph{Annales de la Faculté des Sciences de Toulouse}, 21 (3):
-  501-527.
-  \href{https://afst.centre-mersenne.org/item/AFST_2012_6_21_3_501_0/}{link}
+  501-527,
+  %% \href{https://afst.centre-mersenne.org/item/AFST_2012_6_21_3_501_0/}{link}
+  \doi{10.5802/afst.1343}.
   
   David Ginsbourger, Nicolas Durrande, Olivier Roustant (2013).
-  "Kernels and designs for modelling invariant functions: From group invariance to additivity".
+  "Kernels and designs for modelling invariant functions: From group invariance to additivity"
   \emph{mODa 10 - Advances in Model-Oriented Design and
-  Analysis. Contributions to Statistics}, 107-115.
-  \href{https://link.springer.com/book/10.1007/978-3-319-00218-7}{link}
+  Analysis. Contributions to Statistics}, 107-115,
+  %% \href{https://link.springer.com/book/10.1007/978-3-319-00218-7}{link}
+  \doi{10.1007/978-3-319-00218-7_13}.
   
   Olivier Roustant, David Ginsbourger, Yves Deville (2012).
   "DiceKriging, DiceOptim: Two R Packages for the Analysis of
   Computer Experiments by Kriging-Based Metamodeling and Optimization".
-  \emph{Journal of Statistical Software}, 51(1), 1-55.
-  \doi{10.18637/jss.v051.i01}
+  \emph{Journal of Statistical Software}, 51(1), 1-55, 
+  \doi{10.18637/jss.v051.i01}.
 }
 %%\keyword{ package }
 %%\seealso{}

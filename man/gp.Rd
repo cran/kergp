@@ -263,6 +263,7 @@ myGaussRVec <- covMan(
 ## -- The same, with inlined C code
 ## (see also another example with Rcpp by typing: ?kergp).
 
+\dontrun{
 if (require(inline)) {
 
     kernCode <- "
@@ -271,8 +272,8 @@ if (require(inline)) {
        double SS2 = 0.0, d2, z, *rkern, *rdkern;
 
        d = LENGTH(x1);
-       PROTECT(kern = allocVector(REALSXP, 1)); nprotect++;
-       PROTECT(dkern = allocVector(REALSXP, 2)); nprotect++;
+       PROTECT(kern = Rf_allocVector(REALSXP, 1)); nprotect++;
+       PROTECT(dkern = Rf_allocVector(REALSXP, 2)); nprotect++;
        rkern = REAL(kern);
        rdkern = REAL(dkern);
 
@@ -286,7 +287,7 @@ if (require(inline)) {
        rdkern[1] =  d2; 
        rdkern[0] =  2 * rkern[0] * SS2 / REAL(par)[0];
 
-       SET_ATTR(kern, install(\"gradient\"), dkern);
+       SET_ATTR(kern, Rf_install(\"gradient\"), dkern);
        UNPROTECT(nprotect);
        return kern;
    "
@@ -302,6 +303,7 @@ if (require(inline)) {
                        parNames = c("theta", "sigma2"),
                        label = "Gaussian kernel: C/inline implementation")
 
+}
 }
 
 ## == Simulate data for covMan and trend ==
